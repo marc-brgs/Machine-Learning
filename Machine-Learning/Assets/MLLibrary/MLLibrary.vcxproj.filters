@@ -24,6 +24,9 @@
     <ClInclude Include="MLLibrary.h">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
+    <ClInclude Include="Perceptron.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -33,6 +36,9 @@
       <Filter>Fichiers sources</Filter>
     </ClCompile>
     <ClCompile Include="MLLibrary.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
+    <ClCompile Include="Perceptron.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
   </ItemGroup>
