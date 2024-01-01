@@ -48,7 +48,7 @@ public class PerceptronWrapper
         Debug.Log("Perceptron train");
     }
 
-    public void predict(double[] input, double[] output)
+    public void predict(double[] input, ref double[] output)
     {
         predictPerceptron(this.perceptron, input, output);
         Debug.Log("Perceptron predict");

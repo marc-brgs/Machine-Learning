@@ -10,8 +10,15 @@ public class TestML : MonoBehaviour
     {
         PerceptronWrapper p = new PerceptronWrapper(1, new int[] { 2 }, 1);
 
-        p.train(new double[] { 0 }, new double[] { 0 }, 0); // test
-        p.predict(new double[] { 0 }, new double[] { 0 }); // test
+        // p.train(new double[] { 0 }, new double[] { 0 }, 0); // test
+
+        double[] input = new double[] { 0 };
+        double[] output = new double[1];  // Assurez-vous que la taille est correcte pour la sortie attendue
+
+        p.predict(input, ref output); // test
+
+        // Afficher la sortie
+        Debug.Log("Predicted output: " + output[0]);
     }
 
     // Update is called once per frame

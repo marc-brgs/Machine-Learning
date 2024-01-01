@@ -4,10 +4,21 @@
 #include <iostream>
 #include <cstdlib>
 #include <vector>
+#include <cmath> // exp()
 
 // Utiliser un générateur de nombres aléatoires
 std::default_random_engine generator;
 std::normal_distribution<double> distribution(0.0, 1.0);
+
+// La fonction d'activation sigmoid
+double sigmoid(double x) {
+    return 1 / (1 + std::exp(-x));
+}
+
+// La dérivée de la fonction sigmoid
+double sigmoid_derivative(double x) {
+    return x * (1 - x);
+}
 
 Perceptron::Perceptron() {
     
@@ -72,5 +83,28 @@ void Perceptron::train(const double* input, const double* targetOutput, double l
 }
 
 void Perceptron::predict(const double* input, double* output) {
-    // Implémentez la prédiction de votre perceptron ici.
+    std::vector<double> layerInput(input, input + inputLayerSize);
+    std::vector<double> layerOutput;
+
+    // Propagation à travers chaque couche
+    for (size_t layer = 0; layer < weights.size(); ++layer) {
+        layerOutput.clear();
+        for (size_t neuron = 0; neuron < weights[layer].size(); ++neuron) {
+            double activation = biases[layer][neuron];
+            for (size_t weightIndex = 0; weightIndex < weights[layer][neuron].size(); ++weightIndex) {
+                // Accumuler les entrées pondérées
+                activation += layerInput[weightIndex] * weights[layer][neuron][weightIndex];
+            }
+            // Appliquer la fonction d'activation
+            layerOutput.push_back(sigmoid(activation));
+        }
+
+        // La sortie de cette couche devient l'entrée de la couche suivante
+        layerInput = layerOutput;
+    }
+
+    // Copier la sortie de la dernière couche dans le tableau de sortie
+    for (size_t i = 0; i < layerOutput.size(); ++i) {
+        output[i] = layerOutput[i];
+    }
 }
