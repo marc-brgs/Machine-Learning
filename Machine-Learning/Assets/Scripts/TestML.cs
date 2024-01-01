@@ -8,7 +8,7 @@ public class TestML : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        PerceptronWrapper p = new PerceptronWrapper(1, 0, 1);
+        PerceptronWrapper p = new PerceptronWrapper(1, new int[] { 2 }, 1);
 
         p.train(new double[] { 0 }, new double[] { 0 }, 0); // test
         p.predict(new double[] { 0 }, new double[] { 0 }); // test

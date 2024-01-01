@@ -13,7 +13,7 @@ public class PerceptronWrapper
     public static extern void destroyPerceptron(IntPtr perceptron);
 
     [DllImport("MLLibrary")]
-    public static extern void initializePerceptron(IntPtr perceptron, int inputSize, int hiddenLayerSize, int outputSize);
+    public static extern void initializePerceptron(IntPtr perceptron, int inputSize, int[] hiddenLayerSize, int hiddenLayerCount, int outputSize);
     
     [DllImport("MLLibrary")]
     public static extern void trainPerceptron(IntPtr perceptron, double[] input, double[] targetOutput, double learningRate, int epochs);
@@ -24,13 +24,13 @@ public class PerceptronWrapper
     public IntPtr perceptron;
     public double learningRate;
 
-    public PerceptronWrapper(int inputSize, int hiddenLayerSize, int outputSize)
+    public PerceptronWrapper(int inputSize, int[] hiddenLayerSize, int outputSize)
     {
         IntPtr perceptronPtr;
         createPerceptron(out perceptronPtr);
         Debug.Log("Perceptron created");
 
-        initializePerceptron(perceptronPtr, inputSize, hiddenLayerSize, outputSize); // par référence?
+        initializePerceptron(perceptronPtr, inputSize, hiddenLayerSize, hiddenLayerSize.Length, outputSize); // par référence?
         Debug.Log("Perceptron created");
 
         this.perceptron = perceptronPtr;

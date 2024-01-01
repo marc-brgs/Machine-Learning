@@ -18,8 +18,9 @@ void destroyPerceptron(Perceptron * perceptron) {
     delete perceptron;
 }
 
-void initializePerceptron(Perceptron * perceptron, int inputSize, int hiddenLayerSize, int outputSize) {
-    perceptron->initialize(inputSize, hiddenLayerSize, outputSize);
+void initializePerceptron(Perceptron * perceptron, int inputSize, int* hiddenLayerSizes, int hiddenLayerCount, int outputSize) {
+    std::vector<int> hiddenSizes(hiddenLayerSizes, hiddenLayerSizes + hiddenLayerCount);
+    perceptron->initialize(inputSize, hiddenSizes, outputSize);
 }
 
 void trainPerceptron(Perceptron * perceptron, const double* input, const double* targetOutput, double learningRate, int epochs) {
