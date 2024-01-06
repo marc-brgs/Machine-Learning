@@ -8,27 +8,20 @@ public class TestML : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        PerceptronWrapper p = new PerceptronWrapper(2, new int[] { 2 }, 1);
-        
-        // Entrainement (AND)
-        /*for (int i = 0; i < 100000; i++)
+        //AND();
+        XOR();
+    }
+
+    void AND()
+    {
+        PerceptronWrapper p = new PerceptronWrapper(2, new int[] { 1 }, 1);
+
+        for (int i = 0; i < 100000; i++)
         {
             p.train(new double[] { 0, 0 }, new double[] { 0 }, 1);
             p.train(new double[] { 0, 1 }, new double[] { 0 }, 1);
             p.train(new double[] { 1, 0 }, new double[] { 0 }, 1);
             p.train(new double[] { 1, 1 }, new double[] { 1 }, 1);
-        }
-
-        // Afficher la sortie
-        p.predict(new double[] { 0, 0 });
-        p.predict(new double[] { 1, 1 });*/
-
-        for (int i = 0; i < 100000; i++)
-        {
-            p.train(new double[] { 0, 0 }, new double[] { 0 }, 1);
-            p.train(new double[] { 0, 1 }, new double[] { 1 }, 1);
-            p.train(new double[] { 1, 0 }, new double[] { 1 }, 1);
-            p.train(new double[] { 1, 1 }, new double[] { 0 }, 1);
         }
 
         // Afficher la sortie
@@ -57,6 +50,19 @@ public class TestML : MonoBehaviour
         // Linear Model : KO
         // MLP (2, 2, 1) : OK
         PerceptronWrapper p = new PerceptronWrapper(2, new int[] { 2 }, 1);
+
+        for (int i = 0; i < 100000; i++)
+        {
+            p.train(new double[] { 0, 0 }, new double[] { 0 }, 1);
+            p.train(new double[] { 0, 1 }, new double[] { 1 }, 1);
+            p.train(new double[] { 1, 0 }, new double[] { 1 }, 1);
+            p.train(new double[] { 1, 1 }, new double[] { 0 }, 1);
+        }
+
+        p.predict(new double[] { 0, 0 });
+        p.predict(new double[] { 0, 1 });
+        p.predict(new double[] { 1, 0 });
+        p.predict(new double[] { 1, 1 });
     }
 
     void Cross()
