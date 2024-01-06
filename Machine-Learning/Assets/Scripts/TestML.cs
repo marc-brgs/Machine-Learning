@@ -8,22 +8,75 @@ public class TestML : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        PerceptronWrapper p = new PerceptronWrapper(1, new int[] { 2 }, 1);
-
-        // p.train(new double[] { 0 }, new double[] { 0 }, 0); // test
-
-        double[] input = new double[] { 0 };
-        double[] output = new double[1];  // Assurez-vous que la taille est correcte pour la sortie attendue
-
-        p.predict(input, ref output); // test
+        PerceptronWrapper p = new PerceptronWrapper(2, new int[] { 2 }, 1);
+        
+        // Entrainement (AND)
+        /*for (int i = 0; i < 100000; i++)
+        {
+            p.train(new double[] { 0, 0 }, new double[] { 0 }, 1);
+            p.train(new double[] { 0, 1 }, new double[] { 0 }, 1);
+            p.train(new double[] { 1, 0 }, new double[] { 0 }, 1);
+            p.train(new double[] { 1, 1 }, new double[] { 1 }, 1);
+        }
 
         // Afficher la sortie
-        Debug.Log("Predicted output: " + output[0]);
+        p.predict(new double[] { 0, 0 });
+        p.predict(new double[] { 1, 1 });*/
+
+        for (int i = 0; i < 100000; i++)
+        {
+            p.train(new double[] { 0, 0 }, new double[] { 0 }, 1);
+            p.train(new double[] { 0, 1 }, new double[] { 1 }, 1);
+            p.train(new double[] { 1, 0 }, new double[] { 1 }, 1);
+            p.train(new double[] { 1, 1 }, new double[] { 0 }, 1);
+        }
+
+        // Afficher la sortie
+        p.predict(new double[] { 0, 0 });
+        p.predict(new double[] { 0, 1 });
+        p.predict(new double[] { 1, 0 });
+        p.predict(new double[] { 1, 1 });
     }
 
-    // Update is called once per frame
-    void Update()
+    void LinearSimple()
     {
-        
+        // Linear Model : OK
+        // MLP (2, 1) : OK
+        PerceptronWrapper p = new PerceptronWrapper(2, new int[] { 0 }, 1);
+    }
+
+    void LinearMultiple()
+    {
+        // Linear Model : OK
+        // MLP (2, 1) : OK
+        PerceptronWrapper p = new PerceptronWrapper(2, new int[] { 0 }, 1);
+    }
+
+    void XOR()
+    {
+        // Linear Model : KO
+        // MLP (2, 2, 1) : OK
+        PerceptronWrapper p = new PerceptronWrapper(2, new int[] { 2 }, 1);
+    }
+
+    void Cross()
+    {
+        // Linear Model : KO
+        // MLP (2, 4, 1) : OK
+        PerceptronWrapper p = new PerceptronWrapper(2, new int[] { 4 }, 1);
+    }
+
+    void MultiLinear3Classes()
+    {
+        // Linear Model : OK
+        // MLP (2, 3) : OK
+        PerceptronWrapper p = new PerceptronWrapper(2, new int[] { 0 }, 3);
+    }
+
+    void MultiCross()
+    {
+        // Linear Model : OK
+        // MLP (2, ?, ?, 3) : OK
+        PerceptronWrapper p = new PerceptronWrapper(2, new int[] { 0 }, 3);
     }
 }

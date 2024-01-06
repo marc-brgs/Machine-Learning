@@ -24,16 +24,20 @@ public class PerceptronWrapper
     public IntPtr perceptron;
     public double learningRate;
 
+    private int outputSize;
+
     public PerceptronWrapper(int inputSize, int[] hiddenLayerSize, int outputSize)
     {
         IntPtr perceptronPtr;
         createPerceptron(out perceptronPtr);
         Debug.Log("Perceptron created");
 
+        this.outputSize = outputSize;
         initializePerceptron(perceptronPtr, inputSize, hiddenLayerSize, hiddenLayerSize.Length, outputSize); // par référence?
         Debug.Log("Perceptron created");
 
         this.perceptron = perceptronPtr;
+        this.learningRate = 0.02;
     }
 
     ~PerceptronWrapper()
@@ -45,12 +49,24 @@ public class PerceptronWrapper
     public void train(double[] input, double[] targetOutput, int epochs)
     {
         trainPerceptron(this.perceptron, input, targetOutput, this.learningRate, epochs);
-        Debug.Log("Perceptron train");
+        //Debug.Log("Perceptron train");
     }
 
-    public void predict(double[] input, ref double[] output)
+    public void predict(double[] input)
     {
+        double[] output = new double[this.outputSize];
+
         predictPerceptron(this.perceptron, input, output);
-        Debug.Log("Perceptron predict");
+
+        string res = "";
+        for(int i = 0; i < output.Length; i++)
+        {
+            res += output[i].ToString();
+            if (i != output.Length-1)
+            {
+                res += ",";
+            }
+        }
+        Debug.Log("Feed forward : [ " + res + " ]");
     }
 }

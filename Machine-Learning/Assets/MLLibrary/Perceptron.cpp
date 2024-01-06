@@ -1,7 +1,9 @@
 #include "pch.h"
 #include "Perceptron.h"
 #include <random>
+#include <string>
 #include <iostream>
+#include <fstream>
 #include <cstdlib>
 #include <vector>
 #include <cmath> // exp()
@@ -21,7 +23,7 @@ double sigmoid_derivative(double x) {
 }
 
 Perceptron::Perceptron() {
-    
+    logClear();
 }
 
 Perceptron::~Perceptron() {
@@ -79,12 +81,57 @@ void Perceptron::initializeBiases() {
 }
 
 void Perceptron::train(const double* input, const double* targetOutput, double learningRate, int epochs) {
-    // Implémentez l'entraînement de votre perceptron ici.
+    std::vector<double> inputs(input, input + inputLayerSize);
+    std::vector<double> outputs(outputLayerSize);
+
+    // Structures pour stocker les activations et les deltas pour chaque couche
+    std::vector<std::vector<double>> deltas(weights.size());
+    
+    for (int epoch = 0; epoch < epochs; ++epoch) {
+        // Feedforward
+        predict(input, outputs.data());
+
+        // Calcul de l'erreur de sortie (différence entre la sortie attendue et la sortie actuelle)
+        std::vector<double> outputError = activations.back();
+        for (size_t i = 0; i < outputLayerSize; ++i) {
+            outputError[i] -= targetOutput[i];
+            //logPrint("Error[" + std::to_string(i) + "]: " + std::to_string(outputError[i]));
+        }
+
+        // Backpropagation
+        for (int layer = weights.size() - 1; layer >= 0; --layer) {
+            std::vector<double> layerDelta(weights[layer].size(), 0.0);
+            for (size_t neuron = 0; neuron < weights[layer].size(); ++neuron) {
+                double delta = outputError[neuron] * sigmoid_derivative(activations[layer][neuron]);
+                layerDelta[neuron] = delta;
+                for (size_t w = 0; w < weights[layer][neuron].size(); ++w) {
+                    // Mise à jour des poids
+                    weights[layer][neuron][w] -= learningRate * delta * (layer > 0 ? activations[layer - 1][w] : inputs[w]);
+                }
+                // Mise à jour des biais
+                biases[layer][neuron] -= learningRate * delta;
+            }
+            // Calculez l'erreur pour la couche suivante
+            if (layer > 0) {
+                for (size_t w = 0; w < weights[layer].size(); ++w) {
+                    double errorSum = 0.0;
+                    for (size_t n = 0; n < weights[layer].size(); ++n) {
+                        errorSum += weights[layer][n][w] * layerDelta[n];
+                    }
+                    outputError[w] = errorSum;
+                }
+            }
+            deltas[layer] = layerDelta; // Enregistrez les deltas pour la rétropropagation
+        }
+    }
 }
+
+
 
 void Perceptron::predict(const double* input, double* output) {
     std::vector<double> layerInput(input, input + inputLayerSize);
     std::vector<double> layerOutput;
+    activations.clear(); // Réinitialiser les activations à chaque nouvelle prédiction
 
     // Propagation à travers chaque couche
     for (size_t layer = 0; layer < weights.size(); ++layer) {
@@ -99,6 +146,9 @@ void Perceptron::predict(const double* input, double* output) {
             layerOutput.push_back(sigmoid(activation));
         }
 
+        // Utilisé pour la méthode train (back propagation)
+        activations.push_back(layerOutput);
+
         // La sortie de cette couche devient l'entrée de la couche suivante
         layerInput = layerOutput;
     }
@@ -107,4 +157,15 @@ void Perceptron::predict(const double* input, double* output) {
     for (size_t i = 0; i < layerOutput.size(); ++i) {
         output[i] = layerOutput[i];
     }
+}
+
+void Perceptron::logClear() {
+    std::ofstream logFile("path_to_log_file.txt", std::ofstream::out | std::ofstream::trunc);
+    logFile.close();
+}
+
+void Perceptron::logPrint(std::string str) {
+    std::ofstream logFile("path_to_log_file.txt", std::ios::out | std::ios::app);
+    logFile << str << std::endl;
+    logFile.close();
 }
