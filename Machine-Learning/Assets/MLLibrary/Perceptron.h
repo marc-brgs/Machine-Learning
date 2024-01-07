@@ -7,17 +7,18 @@ public:
     Perceptron();
     ~Perceptron();
 
-    // Initialiser le perceptron avec le nombre d'entrées, de neurones cachés et de sorties
+    // Init (input, [hidden], output)
     void initialize(int inputSize, const std::vector<int>& hiddenLayerSizes, int outputSize);
 
-    // Entraîner le perceptron avec les données d'entrée et de sortie attendues
+    // Back propagation
     void train(const double* input, const double* targetOutput, double learningRate, int epochs);
 
-    // Effectuer une prédiction avec le perceptron
+    // Feed forward
     void predict(const double* input, double* output);
 
 private:
-    int inputLayerSize; // Tailles des différentes couches
+    // Tailles des couches
+    int inputLayerSize;
     std::vector<int> hiddenLayerSizes;
     int outputLayerSize;
 
@@ -29,6 +30,8 @@ private:
     // Initialisation des poids et biais
     void initializeWeights();
     void initializeBiases();
+
+    // Log file
     void logClear();
     void logPrint(std::string str);
 };

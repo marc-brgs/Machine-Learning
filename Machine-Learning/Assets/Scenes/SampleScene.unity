@@ -294,7 +294,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 963194225}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: -10}
+  m_LocalPosition: {x: 0, y: 0, z: -2}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -311,8 +311,9 @@ GameObject:
   m_Component:
   - component: {fileID: 1993324082}
   - component: {fileID: 1993324081}
+  - component: {fileID: 1993324083}
   m_Layer: 0
-  m_Name: GameObject
+  m_Name: ML Bench
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -330,6 +331,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 35214a527a231404eab1b95396163a0b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  predictionVizualizer: {fileID: 1993324083}
 --- !u!4 &1993324082
 Transform:
   m_ObjectHideFlags: 0
@@ -345,3 +347,16 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1993324083
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1993324080}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 659c03e5ba91b5847b312831bd7eee77, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  pointPrefab: {fileID: 8992850400943844547, guid: c4825446445f4a1419a443fd652f538d, type: 3}

@@ -52,21 +52,33 @@ public class PerceptronWrapper
         //Debug.Log("Perceptron train");
     }
 
-    public void predict(double[] input)
+    public double[] predict(double[] input)
     {
         double[] output = new double[this.outputSize];
 
         predictPerceptron(this.perceptron, input, output);
 
-        string res = "";
+        string outputString = "";
         for(int i = 0; i < output.Length; i++)
         {
-            res += output[i].ToString();
+            outputString += output[i].ToString();
             if (i != output.Length-1)
             {
-                res += ",";
+                outputString += ", ";
             }
         }
-        Debug.Log("Feed forward : [ " + res + " ]");
+
+        string inputString = "";
+        for (int i = 0; i < input.Length; i++)
+        {
+            inputString += input[i].ToString();
+            if (i != input.Length - 1)
+            {
+                inputString += ", ";
+            }
+        }
+        Debug.Log("Feed forward : [ " + inputString + " ] => [ " + outputString + " ]");
+        
+        return output;
     }
 }

@@ -8,7 +8,7 @@
 #include <vector>
 #include <cmath> // exp()
 
-// Utiliser un générateur de nombres aléatoires
+// Générateur de nombres aléatoires entre 0 et 1
 std::default_random_engine generator;
 std::normal_distribution<double> distribution(0.0, 1.0);
 
@@ -41,7 +41,7 @@ void Perceptron::initialize(int inputSize, const std::vector<int>& hiddenLayerSi
 
 void Perceptron::initializeWeights() {
     // Initialiser les poids pour chaque couche, y compris la couche de sortie
-    int layerCount = hiddenLayerSizes.size() + 1; // couche cachée + sortie
+    int layerCount = hiddenLayerSizes.size() + 1; // Couche cachée + sortie
 
     weights.resize(layerCount);
 
@@ -55,7 +55,7 @@ void Perceptron::initializeWeights() {
 
         for (int j = 0; j < currentLayerSize; ++j) {
             for (int k = 0; k < previousLayerSize; ++k) {
-                weights[i][j][k] = distribution(generator); // initialise avec une distribution normale
+                weights[i][j][k] = distribution(generator); // Initialise avec une valeur entre 0 et 1
             }
         }
 
@@ -64,8 +64,8 @@ void Perceptron::initializeWeights() {
 }
 
 void Perceptron::initializeBiases() {
-    // Initialiser les biais pour chaque couche, y compris la couche de sortie
-    int layerCount = hiddenLayerSizes.size() + 1; // couche cachée + sortie
+    // Initialise les biais pour chaque couche, y compris la couche de sortie
+    int layerCount = hiddenLayerSizes.size() + 1; // Couche cachée + sortie
 
     biases.resize(layerCount);
 
@@ -75,7 +75,7 @@ void Perceptron::initializeBiases() {
         biases[i].resize(currentLayerSize);
 
         for (int j = 0; j < currentLayerSize; ++j) {
-            biases[i][j] = distribution(generator); // initialise avec une distribution normale
+            biases[i][j] = distribution(generator); // Initialise avec une valeur entre 0 et 1
         }
     }
 }
@@ -88,7 +88,7 @@ void Perceptron::train(const double* input, const double* targetOutput, double l
     std::vector<std::vector<double>> deltas(weights.size());
 
     for (int epoch = 0; epoch < epochs; ++epoch) {
-        // Feedforward
+        // Feed forward
         predict(input, outputs.data());
 
         // Calcul de l'erreur de sortie (différence entre la sortie attendue et la sortie actuelle)
@@ -97,17 +97,17 @@ void Perceptron::train(const double* input, const double* targetOutput, double l
             outputError[i] = activations.back()[i] - targetOutput[i];
         }
 
-        // Backpropagation
+        // Back propagation
         for (int layer = weights.size() - 1; layer >= 0; --layer) {
             std::vector<double> layerDelta(weights[layer].size(), 0.0);
             for (size_t neuron = 0; neuron < weights[layer].size(); ++neuron) {
                 double delta;
                 if (layer == weights.size() - 1) {
-                    // Pour la dernière couche, utilisez l'erreur de sortie directement
+                    // Pour la dernière couche, on utilise l'erreur de sortie directement
                     delta = outputError[neuron] * sigmoid_derivative(activations[layer][neuron]);
                 }
                 else {
-                    // Pour les couches cachées, calculez l'erreur en fonction des deltas de la couche suivante
+                    // Pour les couches cachées, on calcule l'erreur en fonction des deltas de la couche suivante
                     double errorSum = 0.0;
                     for (size_t nextNeuron = 0; nextNeuron < weights[layer + 1].size(); ++nextNeuron) {
                         errorSum += weights[layer + 1][nextNeuron][neuron] * deltas[layer + 1][nextNeuron];
@@ -126,7 +126,7 @@ void Perceptron::train(const double* input, const double* targetOutput, double l
                 biases[layer][neuron] -= learningRate * delta;
             }
 
-            deltas[layer] = layerDelta; // Enregistrez les deltas pour cette couche
+            deltas[layer] = layerDelta; // Enregistre les deltas pour cette couche
         }
     }
 }
@@ -136,7 +136,7 @@ void Perceptron::train(const double* input, const double* targetOutput, double l
 void Perceptron::predict(const double* input, double* output) {
     std::vector<double> layerInput(input, input + inputLayerSize);
     std::vector<double> layerOutput;
-    activations.clear(); // Réinitialiser les activations à chaque nouvelle prédiction
+    activations.clear(); // Reset les activations à chaque nouvelle prédiction
 
     // Propagation à travers chaque couche
     for (size_t layer = 0; layer < weights.size(); ++layer) {
@@ -144,10 +144,10 @@ void Perceptron::predict(const double* input, double* output) {
         for (size_t neuron = 0; neuron < weights[layer].size(); ++neuron) {
             double activation = biases[layer][neuron];
             for (size_t weightIndex = 0; weightIndex < weights[layer][neuron].size(); ++weightIndex) {
-                // Accumuler les entrées pondérées
+                // Accumulation des entrées pondérées
                 activation += layerInput[weightIndex] * weights[layer][neuron][weightIndex];
             }
-            // Appliquer la fonction d'activation
+            // Application de la fonction d'activation
             layerOutput.push_back(sigmoid(activation));
         }
 
@@ -158,7 +158,7 @@ void Perceptron::predict(const double* input, double* output) {
         layerInput = layerOutput;
     }
 
-    // Copier la sortie de la dernière couche dans le tableau de sortie
+    // Copie de la sortie de la dernière couche dans le tableau de sortie
     for (size_t i = 0; i < layerOutput.size(); ++i) {
         output[i] = layerOutput[i];
     }
