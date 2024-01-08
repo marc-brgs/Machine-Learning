@@ -93,7 +93,7 @@ public class TestML : MonoBehaviour
             Y[i] = (Math.Abs(X[i, 0]) <= 0.3 || Math.Abs(X[i, 1]) <= 0.3) ? 1 : -1;
         }
 
-        for (int e = 0; e < 3000; e++)
+        for (int e = 0; e < 4000; e++)
         {
             for (int i = 0; i < sampleSize; i++)
             {
