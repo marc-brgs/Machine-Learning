@@ -10,7 +10,7 @@
 
 // Générateur de nombres aléatoires entre 0 et 1
 std::default_random_engine generator;
-std::normal_distribution<double> distribution(0.0, 1.0);
+std::normal_distribution<double> distribution(-1.0, 1.0);
 
 // La fonction d'activation sigmoid
 double sigmoid(double x) {
@@ -80,54 +80,52 @@ void Perceptron::initializeBiases() {
     }
 }
 
-void Perceptron::train(const double* input, const double* targetOutput, double learningRate, int epochs) {
+void Perceptron::train(const double* input, const double* targetOutput, double learningRate) {
     std::vector<double> inputs(input, input + inputLayerSize);
     std::vector<double> outputs(outputLayerSize);
 
     // Structures pour stocker les activations et les deltas pour chaque couche
     std::vector<std::vector<double>> deltas(weights.size());
 
-    for (int epoch = 0; epoch < epochs; ++epoch) {
-        // Feed forward
-        predict(input, outputs.data());
+    // Feed forward
+    predict(input, outputs.data());
 
-        // Calcul de l'erreur de sortie (différence entre la sortie attendue et la sortie actuelle)
-        std::vector<double> outputError = activations.back();
-        for (size_t i = 0; i < outputLayerSize; ++i) {
-            outputError[i] = activations.back()[i] - targetOutput[i];
-        }
+    // Calcul de l'erreur de sortie (différence entre la sortie attendue et la sortie actuelle)
+    std::vector<double> outputError = activations.back();
+    for (size_t i = 0; i < outputLayerSize; ++i) {
+        outputError[i] = activations.back()[i] - targetOutput[i];
+    }
 
-        // Back propagation
-        for (int layer = weights.size() - 1; layer >= 0; --layer) {
-            std::vector<double> layerDelta(weights[layer].size(), 0.0);
-            for (size_t neuron = 0; neuron < weights[layer].size(); ++neuron) {
-                double delta;
-                if (layer == weights.size() - 1) {
-                    // Pour la dernière couche, on utilise l'erreur de sortie directement
-                    delta = outputError[neuron] * sigmoid_derivative(activations[layer][neuron]);
+    // Back propagation
+    for (int layer = weights.size() - 1; layer >= 0; --layer) {
+        std::vector<double> layerDelta(weights[layer].size(), 0.0);
+        for (size_t neuron = 0; neuron < weights[layer].size(); ++neuron) {
+            double delta;
+            if (layer == weights.size() - 1) {
+                // Pour la dernière couche, on utilise l'erreur de sortie directement
+                delta = outputError[neuron] * sigmoid_derivative(activations[layer][neuron]);
+            }
+            else {
+                // Pour les couches cachées, on calcule l'erreur en fonction des deltas de la couche suivante
+                double errorSum = 0.0;
+                for (size_t nextNeuron = 0; nextNeuron < weights[layer + 1].size(); ++nextNeuron) {
+                    errorSum += weights[layer + 1][nextNeuron][neuron] * deltas[layer + 1][nextNeuron];
                 }
-                else {
-                    // Pour les couches cachées, on calcule l'erreur en fonction des deltas de la couche suivante
-                    double errorSum = 0.0;
-                    for (size_t nextNeuron = 0; nextNeuron < weights[layer + 1].size(); ++nextNeuron) {
-                        errorSum += weights[layer + 1][nextNeuron][neuron] * deltas[layer + 1][nextNeuron];
-                    }
-                    delta = errorSum * sigmoid_derivative(activations[layer][neuron]);
-                }
-                layerDelta[neuron] = delta;
+                delta = errorSum * sigmoid_derivative(activations[layer][neuron]);
+            }
+            layerDelta[neuron] = delta;
 
-                // Mise à jour des poids
-                for (size_t w = 0; w < weights[layer][neuron].size(); ++w) {
-                    double inputVal = layer > 0 ? activations[layer - 1][w] : inputs[w];
-                    weights[layer][neuron][w] -= learningRate * delta * inputVal;
-                }
-
-                // Mise à jour des biais
-                biases[layer][neuron] -= learningRate * delta;
+            // Mise à jour des poids
+            for (size_t w = 0; w < weights[layer][neuron].size(); ++w) {
+                double inputVal = layer > 0 ? activations[layer - 1][w] : inputs[w];
+                weights[layer][neuron][w] -= learningRate * delta * inputVal;
             }
 
-            deltas[layer] = layerDelta; // Enregistre les deltas pour cette couche
+            // Mise à jour des biais
+            biases[layer][neuron] -= learningRate * delta;
         }
+
+        deltas[layer] = layerDelta; // Enregistre les deltas pour cette couche
     }
 }
 

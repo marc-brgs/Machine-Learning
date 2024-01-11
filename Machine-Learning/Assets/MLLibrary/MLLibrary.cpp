@@ -23,8 +23,8 @@ void initializePerceptron(Perceptron * perceptron, int inputSize, int* hiddenLay
     perceptron->initialize(inputSize, hiddenSizes, outputSize);
 }
 
-void trainPerceptron(Perceptron * perceptron, const double* input, const double* targetOutput, double learningRate, int epochs) {
-    perceptron->train(input, targetOutput, learningRate, epochs);
+void trainPerceptron(Perceptron * perceptron, const double* input, const double* targetOutput, double learningRate) {
+    perceptron->train(input, targetOutput, learningRate);
 }
 
 void predictPerceptron(Perceptron * perceptron, const double* input, double* output) {

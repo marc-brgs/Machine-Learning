@@ -11,21 +11,22 @@ public class TestML : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        //AND();
-        //XOR();
-        Cross();
+        //AND(100000, 0.02);
+        //XOR(200000, 0.01);
+        Cross(1500, 0.1);
     }
 
-    void AND()
+    void AND(int epochs, double learningRate)
     {
-        PerceptronWrapper p = new PerceptronWrapper(2, new int[] { 1 }, 1);
+        PerceptronWrapper p = new PerceptronWrapper(2, new int[] { }, 1);
+        p.learningRate = learningRate;
 
-        for (int i = 0; i < 100000; i++)
+        for (int i = 0; i < epochs; i++)
         {
-            p.train(new double[] { 0, 0 }, new double[] { 0 }, 1);
-            p.train(new double[] { 0, 1 }, new double[] { 0 }, 1);
-            p.train(new double[] { 1, 0 }, new double[] { 0 }, 1);
-            p.train(new double[] { 1, 1 }, new double[] { 1 }, 1);
+            p.train(new double[] { 0, 0 }, new double[] { 0 });
+            p.train(new double[] { 0, 1 }, new double[] { 0 });
+            p.train(new double[] { 1, 0 }, new double[] { 0 });
+            p.train(new double[] { 1, 1 }, new double[] { 1 });
         }
 
         // Afficher la sortie
@@ -39,28 +40,29 @@ public class TestML : MonoBehaviour
     {
         // Linear Model : OK
         // MLP (2, 1) : OK
-        PerceptronWrapper p = new PerceptronWrapper(2, new int[] { 0 }, 1);
+        PerceptronWrapper p = new PerceptronWrapper(2, new int[] { }, 1);
     }
 
     void LinearMultiple()
     {
         // Linear Model : OK
         // MLP (2, 1) : OK
-        PerceptronWrapper p = new PerceptronWrapper(2, new int[] { 0 }, 1);
+        PerceptronWrapper p = new PerceptronWrapper(2, new int[] { }, 1);
     }
 
-    void XOR()
+    void XOR(int epochs, double learningRate)
     {
         // Linear Model : KO
         // MLP (2, 2, 1) : OK
         PerceptronWrapper p = new PerceptronWrapper(2, new int[] { 2 }, 1);
+        p.learningRate = learningRate;
 
-        for (int i = 0; i < 100000; i++)
+        for (int i = 0; i < epochs; i++)
         {
-            p.train(new double[] { 0, 0 }, new double[] { 0 }, 1);
-            p.train(new double[] { 0, 1 }, new double[] { 1 }, 1);
-            p.train(new double[] { 1, 0 }, new double[] { 1 }, 1);
-            p.train(new double[] { 1, 1 }, new double[] { 0 }, 1);
+            p.train(new double[] { 0, 0 }, new double[] { 0 });
+            p.train(new double[] { 0, 1 }, new double[] { 1 });
+            p.train(new double[] { 1, 0 }, new double[] { 1 });
+            p.train(new double[] { 1, 1 }, new double[] { 0 });
         }
 
         p.predict(new double[] { 0, 0 });
@@ -69,11 +71,12 @@ public class TestML : MonoBehaviour
         p.predict(new double[] { 1, 1 });
     }
 
-    void Cross()
+    void Cross(int epochs, double learningRate)
     {
         // Linear Model : KO
         // MLP (2, 4, 1) : OK
         PerceptronWrapper p = new PerceptronWrapper(2, new int[] { 4 }, 1);
+        p.learningRate = learningRate;
 
         // Génération des données X
         int sampleSize = 500; // Précision de la forme (croix)
@@ -93,11 +96,12 @@ public class TestML : MonoBehaviour
             Y[i] = (Math.Abs(X[i, 0]) <= 0.3 || Math.Abs(X[i, 1]) <= 0.3) ? 1 : -1;
         }
 
-        for (int e = 0; e < 4000; e++)
+        // Entrainement
+        for (int e = 0; e < epochs; e++)
         {
             for (int i = 0; i < sampleSize; i++)
             {
-                p.train(new double[] { X[i, 0], X[i, 1] }, new double[] { Y[i] }, 1);
+                p.train(new double[] { X[i, 0], X[i, 1] }, new double[] { Y[i] });
             }
         }
 

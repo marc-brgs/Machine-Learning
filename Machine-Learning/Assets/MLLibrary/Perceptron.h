@@ -11,7 +11,7 @@ public:
     void initialize(int inputSize, const std::vector<int>& hiddenLayerSizes, int outputSize);
 
     // Back propagation
-    void train(const double* input, const double* targetOutput, double learningRate, int epochs);
+    void train(const double* input, const double* targetOutput, double learningRate);
 
     // Feed forward
     void predict(const double* input, double* output);
