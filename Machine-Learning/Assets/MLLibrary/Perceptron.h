@@ -16,21 +16,25 @@ public:
     // Feed forward
     void predict(const double* input, double* output);
 
+    // Métriques
+    double* getOutputError();
+
 private:
     // Tailles des couches
     int inputLayerSize;
     std::vector<int> hiddenLayerSizes;
     int outputLayerSize;
 
-    // Poids et biais
+    // Listes
     std::vector<std::vector<std::vector<double>>> weights; // poids [couche][neurone][poids]
     std::vector<std::vector<double>> biases; // biais [couche][neurone]
     std::vector<std::vector<double>> activations; // activations [couche][neurone]
+    std::vector<double> outputError; // marge d'erreur en sortie [neurone]
 
     // Initialisation des poids et biais
     void initializeWeights();
     void initializeBiases();
-
+    
     // Log file
     void logClear();
     void logPrint(std::string str);

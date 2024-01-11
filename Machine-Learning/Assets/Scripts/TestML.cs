@@ -30,10 +30,10 @@ public class TestML : MonoBehaviour
         }
 
         // Afficher la sortie
-        p.predict(new double[] { 0, 0 });
-        p.predict(new double[] { 0, 1 });
-        p.predict(new double[] { 1, 0 });
-        p.predict(new double[] { 1, 1 });
+        p.predict(new double[] { 0, 0 }, true);
+        p.predict(new double[] { 0, 1 }, true);
+        p.predict(new double[] { 1, 0 }, true);
+        p.predict(new double[] { 1, 1 }, true);
     }
 
     void LinearSimple()
@@ -65,10 +65,10 @@ public class TestML : MonoBehaviour
             p.train(new double[] { 1, 1 }, new double[] { 0 });
         }
 
-        p.predict(new double[] { 0, 0 });
-        p.predict(new double[] { 0, 1 });
-        p.predict(new double[] { 1, 0 });
-        p.predict(new double[] { 1, 1 });
+        p.predict(new double[] { 0, 0 }, true);
+        p.predict(new double[] { 0, 1 }, true);
+        p.predict(new double[] { 1, 0 }, true);
+        p.predict(new double[] { 1, 1 }, true);
     }
 
     void Cross(int epochs, double learningRate)
@@ -95,7 +95,7 @@ public class TestML : MonoBehaviour
         {
             Y[i] = (Math.Abs(X[i, 0]) <= 0.3 || Math.Abs(X[i, 1]) <= 0.3) ? 1 : -1;
         }
-
+        
         // Entrainement
         for (int e = 0; e < epochs; e++)
         {
@@ -112,13 +112,10 @@ public class TestML : MonoBehaviour
             Z[i] = p.predict(new double[] { X[i, 0], X[i, 1] })[0];
         }
 
+        //p.getOutputError();
+
         predictionVizualizer.VisualizeData(X, Z);
         //predictionVizualizer.VisualizePredictions(p);
-    }
-
-    private GameObject Instantiate(object pointPrefab, Vector3 vector3, Quaternion identity)
-    {
-        throw new NotImplementedException();
     }
 
     void MultiLinear3Classes()

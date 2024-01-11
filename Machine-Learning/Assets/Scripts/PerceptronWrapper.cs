@@ -21,6 +21,9 @@ public class PerceptronWrapper
     [DllImport("MLLibrary")]
     public static extern void predictPerceptron(IntPtr perceptron, double[] input, double[] output);
 
+    [DllImport("MLLibrary")]
+    public static extern double[] getOutputError(IntPtr perceptron);
+
     public IntPtr perceptron;
     public double learningRate;
 
@@ -34,7 +37,7 @@ public class PerceptronWrapper
 
         this.outputSize = outputSize;
         initializePerceptron(perceptronPtr, inputSize, hiddenLayerSize, hiddenLayerSize.Length, outputSize); // par référence?
-        Debug.Log("Perceptron created");
+        Debug.Log("Perceptron initialized");
 
         this.perceptron = perceptronPtr;
         this.learningRate = 0.02;
@@ -52,7 +55,7 @@ public class PerceptronWrapper
         //Debug.Log("Perceptron train");
     }
 
-    public double[] predict(double[] input)
+    public double[] predict(double[] input, bool print=false)
     {
         double[] output = new double[this.outputSize];
 
@@ -77,8 +80,17 @@ public class PerceptronWrapper
                 inputString += ", ";
             }
         }
-        Debug.Log("Feed forward : [ " + inputString + " ] => [ " + outputString + " ]");
-        
+
+        if (print)
+        {
+            Debug.Log("Feed forward : [ " + inputString + " ] => [ " + outputString + " ]");
+        }
+
         return output;
+    }
+
+    public void getOutputError()
+    {
+        double[] error = getOutputError(this.perceptron);
     }
 }

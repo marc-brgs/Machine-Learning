@@ -312,6 +312,7 @@ GameObject:
   - component: {fileID: 1993324082}
   - component: {fileID: 1993324081}
   - component: {fileID: 1993324083}
+  - component: {fileID: 1993324084}
   m_Layer: 0
   m_Name: ML Bench
   m_TagString: Untagged
@@ -360,3 +361,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   pointPrefab: {fileID: 8992850400943844547, guid: c4825446445f4a1419a443fd652f538d, type: 3}
+--- !u!114 &1993324084
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1993324080}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 246ca4d0bfe193a4290019ab87c6fbbc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  epochs: 100000
+  epochCluster: 1000
+  printInterval: 1000

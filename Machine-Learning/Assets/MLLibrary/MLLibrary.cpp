@@ -10,23 +10,27 @@ static unsigned long long previous_;  // Previous value, if any
 static unsigned long long current_;   // Current sequence value
 static unsigned index_;               // Current seq. position
 
-void createPerceptron(Perceptron * *perceptron) {
+void createPerceptron(Perceptron* *perceptron) {
     *perceptron = new Perceptron();
 }
 
-void destroyPerceptron(Perceptron * perceptron) {
+void destroyPerceptron(Perceptron* perceptron) {
     delete perceptron;
 }
 
-void initializePerceptron(Perceptron * perceptron, int inputSize, int* hiddenLayerSizes, int hiddenLayerCount, int outputSize) {
+void initializePerceptron(Perceptron* perceptron, int inputSize, int* hiddenLayerSizes, int hiddenLayerCount, int outputSize) {
     std::vector<int> hiddenSizes(hiddenLayerSizes, hiddenLayerSizes + hiddenLayerCount);
     perceptron->initialize(inputSize, hiddenSizes, outputSize);
 }
 
-void trainPerceptron(Perceptron * perceptron, const double* input, const double* targetOutput, double learningRate) {
+void trainPerceptron(Perceptron* perceptron, const double* input, const double* targetOutput, double learningRate) {
     perceptron->train(input, targetOutput, learningRate);
 }
 
-void predictPerceptron(Perceptron * perceptron, const double* input, double* output) {
+void predictPerceptron(Perceptron* perceptron, const double* input, double* output) {
     perceptron->predict(input, output);
+}
+
+double* getOutputError(Perceptron* perceptron) {
+    return perceptron->getOutputError();
 }

@@ -91,7 +91,7 @@ void Perceptron::train(const double* input, const double* targetOutput, double l
     predict(input, outputs.data());
 
     // Calcul de l'erreur de sortie (différence entre la sortie attendue et la sortie actuelle)
-    std::vector<double> outputError = activations.back();
+    outputError = activations.back();
     for (size_t i = 0; i < outputLayerSize; ++i) {
         outputError[i] = activations.back()[i] - targetOutput[i];
     }
@@ -160,6 +160,10 @@ void Perceptron::predict(const double* input, double* output) {
     for (size_t i = 0; i < layerOutput.size(); ++i) {
         output[i] = layerOutput[i];
     }
+}
+
+double* Perceptron::getOutputError() {
+    return outputError.data();
 }
 
 void Perceptron::logClear() {
