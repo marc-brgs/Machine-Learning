@@ -10,7 +10,7 @@
 
 // Générateur de nombres aléatoires entre 0 et 1
 std::default_random_engine generator;
-std::normal_distribution<double> distribution(-1.0, 1.0);
+std::normal_distribution<double> distribution(0.0, 1.0);
 
 // La fonction d'activation sigmoid
 double sigmoid(double x) {
@@ -162,8 +162,11 @@ void Perceptron::predict(const double* input, double* output) {
     }
 }
 
-double* Perceptron::getOutputError() {
-    return outputError.data();
+void Perceptron::getOutputError(double* error) {
+    for (size_t i = 0; i < outputLayerSize; i++) {
+        error[i] = outputError[i];
+    }
+    //return outputError.data();
 }
 
 void Perceptron::logClear() {

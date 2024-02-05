@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class App : MonoBehaviour
@@ -9,52 +10,106 @@ public class App : MonoBehaviour
     public int epochs = 100000;
     public int epochCluster = 100; // Higher = faster processing but less fps
     public int printInterval = 1000;
+    public double learningRate = 0.05f;
 
     private bool isTraining = true;
     private int epoch = 0;
 
+    string[] RLImagesPath;
+    string[] CSImagesPath;
+    string[] DSImagesPath;
+
+    float startTraining;
+
     // Start is called before the first frame update
     void Start()
     {
-        p = new PerceptronWrapper(2, new int[] { 2 }, 1);
-        p.learningRate = 0.05f;
+        p = new PerceptronWrapper(3888, new int[] { 100, 20, 10 }, 3);
+        p.learningRate = learningRate;
 
-        Texture2D tex = LoadPNG("./Assets/Dataset/Train/Rocket League/RL1Image-000.jpg");
-        PixelLoader(tex);
+        //RLImagesPath = ReadFolder("./Assets/Dataset/Train/Rocket League");
+        //CSImagesPath = ReadFolder("./Assets/Dataset/Train/Counter Strike");
+        //DSImagesPath = ReadFolder("./Assets/Dataset/Train/Dark Souls");
+
+        testPredictWithSample();
+        startTraining = Time.time;
+    }
+
+    public void testPredictWithSample(bool measure=false)
+    {
+        double[] output = p.predict(PixelLoader(LoadPNG("./Assets/Dataset/Train/Rocket League/RL1Image-000.jpg")));
+
+        if (measure)
+        {
+            p.getOutputError();
+        }
+        else
+        {
+            double[] output2 = p.predict(PixelLoader(LoadPNG("./Assets/Dataset/Train/Counter Strike/CS1Image-000.jpg")));
+            double[] output3 = p.predict(PixelLoader(LoadPNG("./Assets/Dataset/Train/Dark Souls/DSP2Image-000.jpg")));
+            Debug.Log("Test d'image Rocket League (probabilités) : (RL : " + output[0] + ", CS : " + output[1] + ", DS : " + output[2] + ")");
+            Debug.Log("Test d'image Counter Strike (probabilités) : (RL : " + output2[0] + ", CS : " + output2[1] + ", DS : " + output2[2] + ")");
+            Debug.Log("Test d'image Dark Souls (probabilités) : (RL : " + output3[0] + ", CS : " + output3[1] + ", DS : " + output3[2] + ")");
+        }
+
     }
 
     // Update is called once per frame
     void Update()
     {
         InterruptTraining();
-
+        
         if (isTraining)
         {
             if (epoch < epochs)
             {
                 for(int i = 0; i < epochCluster; i++) {
+                    if (epoch >= epochs) break;
+
+                    for(int j = 0; j < 1; j++)
+                    {
+                        //Texture2D texRL = LoadPNG(RLImagesPath[i]);
+                        Texture2D texRL = LoadPNG("./Assets/Dataset/Train/Rocket League/RL1Image-00"+ j + ".jpg");
+                        double[] inputsRL = PixelLoader(texRL);
+                        double[] outputsRL = new double[] { 1, 0, 0 };
+
+                        //Texture2D texCS = LoadPNG(CSImagesPath[i]);
+                        Texture2D texCS = LoadPNG("./Assets/Dataset/Train/Counter Strike/CS1Image-00"+ j +".jpg");
+                        double[] inputsCS = PixelLoader(texCS);
+                        double[] outputsCS = new double[] { 0, 1, 0 };
+
+                        //Texture2D texDS = LoadPNG(DSImagesPath[i]);
+                        Texture2D texDS = LoadPNG("./Assets/Dataset/Train/Dark Souls/DSP2Image-00"+ j +".jpg");
+                        double[] inputsDS = PixelLoader(texDS);
+                        double[] outputsDS = new double[] { 0, 0, 1 };
+
+                        p.train(inputsRL, outputsRL);
+                        p.train(inputsCS, outputsCS);
+                        p.train(inputsDS, outputsDS);
+                    }
                     //p.train(new double[] { 0, 0 }, new double[] { 0 });
                     //p.train(new double[] { 0, 1 }, new double[] { 1 });
                     //p.train(new double[] { 1, 0 }, new double[] { 1 });
                     //p.train(new double[] { 1, 1 }, new double[] { 0 });
-                    epoch++;
-                }
 
-                // Current step
-                if (epoch % printInterval == 0)
-                {
-                    Debug.Log(epoch + " / " + epochs);
+                    testPredictWithSample(true);
+                    epoch++;
+
+                    // Current step
+                    if (epoch % printInterval == 0)
+                    {
+                        Debug.Log(epoch + " / " + epochs);
+                    }
                 }
             }
             else
             {
                 isTraining = false;
-                Debug.Log("Training finished");
+                float trainingDuration = Time.time - startTraining;
+                Debug.Log("Training finished (duration : "+ trainingDuration + "s");
 
-                p.predict(new double[] { 0, 0 }, true);
-                p.predict(new double[] { 0, 1 }, true);
-                p.predict(new double[] { 1, 0 }, true);
-                p.predict(new double[] { 1, 1 }, true);
+                testPredictWithSample();
+                p.printErrorOverTime();
             }
         }
     }
@@ -111,7 +166,22 @@ public class App : MonoBehaviour
 
             }
         }
-        Debug.Log(myList.Count);
+        //Debug.Log(myList.Count);
         return myList.ToArray();
+    }
+    
+    public string[] ReadFolder(string dir)
+    {
+        if (Directory.Exists(dir))
+        {
+            string[] files = Directory.GetFiles(dir, "*.jpg", SearchOption.AllDirectories);
+            Debug.Log(dir + " : " + files.Length + " images");
+            return files;
+        }
+        else
+        {
+            Debug.Log("Dossier non trouvé : " + dir);
+            return new string[] { };
+        }
     }
 }

@@ -22,12 +22,13 @@ public class PerceptronWrapper
     public static extern void predictPerceptron(IntPtr perceptron, double[] input, double[] output);
 
     [DllImport("MLLibrary")]
-    public static extern double[] getOutputError(IntPtr perceptron);
+    public static extern void evaluatePerceptron(IntPtr perceptron, double[] error);
 
     public IntPtr perceptron;
     public double learningRate;
 
     private int outputSize;
+    private List<double> errorOverTime;
 
     public PerceptronWrapper(int inputSize, int[] hiddenLayerSize, int outputSize)
     {
@@ -41,6 +42,7 @@ public class PerceptronWrapper
 
         this.perceptron = perceptronPtr;
         this.learningRate = 0.02;
+        this.errorOverTime = new List<double>();
     }
 
     ~PerceptronWrapper()
@@ -89,8 +91,39 @@ public class PerceptronWrapper
         return output;
     }
 
-    public void getOutputError()
+    public void getOutputError(bool print=false)
     {
-        double[] error = getOutputError(this.perceptron);
+        double[] error = new double[this.outputSize];
+
+        evaluatePerceptron(this.perceptron, error);
+
+        double avgError = 0;
+        string str = "";
+        for (int i = 0; i < error.Length; i++)
+        {
+            if (print)
+            {
+                str += "ERROR[" + i + "] : " + error[i] + "\n";
+            }
+
+            avgError += Math.Abs(error[i]);
+        }
+        avgError /= error.Length;
+
+        if (print)
+        {
+            Debug.Log(str);
+        }
+        errorOverTime.Add(avgError);
+    }
+
+    public void printErrorOverTime()
+    {
+        string str = "";
+        for(int i = 0; i < this.errorOverTime.Count; i++)
+        {
+            str += i + " " + this.errorOverTime[i] + "\n";
+        }
+        Debug.Log(str);
     }
 }

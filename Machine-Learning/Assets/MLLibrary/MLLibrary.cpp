@@ -31,6 +31,6 @@ void predictPerceptron(Perceptron* perceptron, const double* input, double* outp
     perceptron->predict(input, output);
 }
 
-double* getOutputError(Perceptron* perceptron) {
-    return perceptron->getOutputError();
+void evaluatePerceptron(Perceptron* perceptron, double* error) {
+    perceptron->getOutputError(error);
 }

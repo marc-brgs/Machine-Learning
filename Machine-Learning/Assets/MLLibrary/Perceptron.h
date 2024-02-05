@@ -17,7 +17,7 @@ public:
     void predict(const double* input, double* output);
 
     // Métriques
-    double* getOutputError();
+    void getOutputError(double* error);
 
 private:
     // Tailles des couches
