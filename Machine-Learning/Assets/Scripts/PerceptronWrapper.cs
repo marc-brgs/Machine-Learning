@@ -100,11 +100,21 @@ public class PerceptronWrapper
     public void saveToFile(string filename)
     {
         savePerceptronToFile(perceptron, filename);
+        Debug.Log("Perceptron saved to \"" + filename + "\"");
     }
 
     public void loadFromFile(string filename)
     {
-        loadPerceptronFromFile(perceptron, filename);
+        if(System.IO.File.Exists(filename))
+        {
+            loadPerceptronFromFile(perceptron, filename);
+            Debug.Log("Perceptron loaded from \"" + filename + "\"");
+        }
+        else
+        {
+            Debug.Log("Failed to load perceptron from \"" + filename + "\"");
+        }
+        
     }
 
     /**
