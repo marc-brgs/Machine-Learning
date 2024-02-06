@@ -11,6 +11,11 @@ public class App : MonoBehaviour
     public int epochCluster = 100; // Higher = faster processing but less fps
     public int printInterval = 1000;
     public double learningRate = 0.05f;
+    public int inputLayerSize = 3888;
+    public List<int> hiddenLayerSizes = new List<int> { 100, 20, 10 };
+    public int outputLayerSize = 3;
+    public int imagesPerGame = 3;
+    public int imageIndexToTest = 5;
 
     private bool isTraining = true;
     private int epoch = 0;
@@ -24,7 +29,7 @@ public class App : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        p = new PerceptronWrapper(3888, new int[] { 100, 20, 10 }, 3);
+        p = new PerceptronWrapper(inputLayerSize, hiddenLayerSizes.ToArray(), outputLayerSize);
         p.learningRate = learningRate;
 
         //RLImagesPath = ReadFolder("./Assets/Dataset/Train/Rocket League");
@@ -37,7 +42,7 @@ public class App : MonoBehaviour
 
     public void testPredictWithSample(bool measure=false)
     {
-        double[] output = p.predict(PixelLoader(LoadPNG("./Assets/Dataset/Train/Rocket League/RL1Image-000.jpg")));
+        double[] output = p.predict(PixelLoader(LoadPNG("./Assets/Dataset/Train/Rocket League/RL1Image-00"+ imageIndexToTest +".jpg")));
 
         if (measure)
         {
@@ -45,8 +50,8 @@ public class App : MonoBehaviour
         }
         else
         {
-            double[] output2 = p.predict(PixelLoader(LoadPNG("./Assets/Dataset/Train/Counter Strike/CS1Image-000.jpg")));
-            double[] output3 = p.predict(PixelLoader(LoadPNG("./Assets/Dataset/Train/Dark Souls/DSP2Image-000.jpg")));
+            double[] output2 = p.predict(PixelLoader(LoadPNG("./Assets/Dataset/Train/Counter Strike/CS1Image-00"+ imageIndexToTest + ".jpg")));
+            double[] output3 = p.predict(PixelLoader(LoadPNG("./Assets/Dataset/Train/Dark Souls/DSP2Image-00"+ imageIndexToTest +".jpg")));
             Debug.Log("Test d'image Rocket League (probabilités) : (RL : " + output[0] + ", CS : " + output[1] + ", DS : " + output[2] + ")");
             Debug.Log("Test d'image Counter Strike (probabilités) : (RL : " + output2[0] + ", CS : " + output2[1] + ", DS : " + output2[2] + ")");
             Debug.Log("Test d'image Dark Souls (probabilités) : (RL : " + output3[0] + ", CS : " + output3[1] + ", DS : " + output3[2] + ")");
@@ -66,7 +71,7 @@ public class App : MonoBehaviour
                 for(int i = 0; i < epochCluster; i++) {
                     if (epoch >= epochs) break;
 
-                    for(int j = 0; j < 1; j++)
+                    for(int j = 0; j < imagesPerGame; j++)
                     {
                         //Texture2D texRL = LoadPNG(RLImagesPath[i]);
                         Texture2D texRL = LoadPNG("./Assets/Dataset/Train/Rocket League/RL1Image-00"+ j + ".jpg");
@@ -87,10 +92,6 @@ public class App : MonoBehaviour
                         p.train(inputsCS, outputsCS);
                         p.train(inputsDS, outputsDS);
                     }
-                    //p.train(new double[] { 0, 0 }, new double[] { 0 });
-                    //p.train(new double[] { 0, 1 }, new double[] { 1 });
-                    //p.train(new double[] { 1, 0 }, new double[] { 1 });
-                    //p.train(new double[] { 1, 1 }, new double[] { 0 });
 
                     testPredictWithSample(true);
                     epoch++;
@@ -110,6 +111,7 @@ public class App : MonoBehaviour
 
                 testPredictWithSample();
                 p.printErrorOverTime();
+                p.printPythonPlotScript();
             }
         }
     }

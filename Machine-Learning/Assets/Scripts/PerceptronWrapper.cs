@@ -91,6 +91,10 @@ public class PerceptronWrapper
         return output;
     }
 
+    /**
+     * Measure error of the latest training (must have been trained at least once before)
+     * Should be called after train method
+     */
     public void getOutputError(bool print=false)
     {
         double[] error = new double[this.outputSize];
@@ -117,13 +121,51 @@ public class PerceptronWrapper
         errorOverTime.Add(avgError);
     }
 
+    /**
+     * Print each measured error (by getOutputError) in Unity console
+     */
     public void printErrorOverTime()
     {
-        string str = "";
+        string str = string.Empty;
         for(int i = 0; i < this.errorOverTime.Count; i++)
         {
-            str += i + " " + this.errorOverTime[i] + "\n";
+            str += i + ", " + this.errorOverTime[i].ToString("F5").Replace(",", ".") + "\n";
         }
+
         Debug.Log(str);
+    }
+
+    public void printPythonPlotScript()
+    {
+        string index = string.Empty;
+        string value = string.Empty;
+        for (int i = 0; i < this.errorOverTime.Count; i++)
+        {
+            index += i;
+            value += this.errorOverTime[i].ToString("F5").Replace(",", ".");
+
+            if(i != this.errorOverTime.Count - 1)
+            {
+                index += ",";
+                value += ",";
+            }
+        }
+        // Remove last char (",")
+        //index.Remove(index.Length - 1);
+        //value.Remove(value.Length - 1);
+
+        string script =
+            "import matplotlib.pyplot as plt\n" +
+            "import numpy as np\n" +
+            "index = [" + index + "]\n" +
+            "value = [" + value + "]\n" +
+            "plt.plot(index, value)\n" +
+            "plt.title(\"x1 Image prediction\")\n" +
+            "plt.xlabel(\"Epoch\")\n" +
+            "plt.ylabel(\"Outputs error margin (average)\")\n" +
+            "plt.grid()\n" +
+            "plt.show()\n";
+
+        Debug.Log(script);
     }
 }
