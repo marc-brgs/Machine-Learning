@@ -17,7 +17,8 @@ public class App : MonoBehaviour
     public List<int> hiddenLayerSizes = new List<int> { 100, 20, 10 };
     public int outputLayerSize = 3;
     public int imagesPerGame = 1;
-    public int imageIndexToTest = 0;
+    public int imageIndexToTest = 1;
+    public bool matchIndexWithEpoch = true;
 
     private const string DATASET_TRAIN_PATH = "./Assets/Dataset/Train";
     private double[] targetOutputRL = new double[] { 1, 0, 0 };
@@ -42,6 +43,7 @@ public class App : MonoBehaviour
     {
         p = new PerceptronWrapper(inputLayerSize, hiddenLayerSizes.ToArray(), outputLayerSize);
         p.learningRate = learningRate;
+        p.loadFromFile("path_to_your_file.dat");
 
         predictTestSample();
         startTraining = Time.time;
@@ -56,13 +58,13 @@ public class App : MonoBehaviour
     public void measureTestSample()
     {        
         // to finish (multiple lists)
-        double[] outputRL = p.predict(LoadImagePixels(DATASET_TRAIN_PATH +"/Rocket League/RL1Image-00" + imageIndexToTest + ".jpg"));
+        double[] outputRL = p.predict(LoadImagePixels(DATASET_TRAIN_PATH +"/Rocket League/RL-image-" + imageIndexToTest + ".jpg"));
         registerErrorAverage(Game.RocketLeague, outputRL);
 
-        double[] outputCS = p.predict(LoadImagePixels(DATASET_TRAIN_PATH +"/Counter Strike/CS1Image-00" + imageIndexToTest + ".jpg"));
+        double[] outputCS = p.predict(LoadImagePixels(DATASET_TRAIN_PATH +"/Counter Strike/CS-image-" + imageIndexToTest + ".jpg"));
         registerErrorAverage(Game.CounterStrike, outputCS);
 
-        double[] outputDS = p.predict(LoadImagePixels(DATASET_TRAIN_PATH +"/Dark Souls/DSP2Image-00" + imageIndexToTest + ".jpg"));
+        double[] outputDS = p.predict(LoadImagePixels(DATASET_TRAIN_PATH +"/Dark Souls/DS-image-" + imageIndexToTest + ".jpg"));
         registerErrorAverage(Game.DarkSouls, outputDS);
     }
 
@@ -96,9 +98,9 @@ public class App : MonoBehaviour
 
     public void predictTestSample()
     {
-        double[] outputRL = p.predict(LoadImagePixels(DATASET_TRAIN_PATH + "/Rocket League/RL1Image-00" + imageIndexToTest + ".jpg"));
-        double[] outputCS = p.predict(LoadImagePixels(DATASET_TRAIN_PATH + "/Counter Strike/CS1Image-00" + imageIndexToTest + ".jpg"));
-        double[] outputDS = p.predict(LoadImagePixels(DATASET_TRAIN_PATH + "/Dark Souls/DSP2Image-00" + imageIndexToTest + ".jpg"));
+        double[] outputRL = p.predict(LoadImagePixels(DATASET_TRAIN_PATH + "/Rocket League/RL-image-" + imageIndexToTest + ".jpg"));
+        double[] outputCS = p.predict(LoadImagePixels(DATASET_TRAIN_PATH + "/Counter Strike/CS-image-" + imageIndexToTest + ".jpg"));
+        double[] outputDS = p.predict(LoadImagePixels(DATASET_TRAIN_PATH + "/Dark Souls/DS-image-" + imageIndexToTest + ".jpg"));
 
         Debug.Log("Test d'image Rocket League (proba.) : (RL : "+ outputRL[0] +", CS: " + outputRL[1] + ", DS: " + outputRL[2] + ")");
         Debug.Log("Test d'image Counter Strike (proba.) : (RL : " + outputCS[0] + ", CS: " + outputCS[1] + ", DS: " + outputCS[2] + ")");
@@ -117,15 +119,20 @@ public class App : MonoBehaviour
                 for(int i = 0; i < epochCluster; i++) {
                     if (epoch >= epochs) break;
 
-                    for(int j = 0; j < imagesPerGame; j++)
+                    for(int j = 1; j < imagesPerGame+1; j++)
                     {
-                        double[] inputsRL = LoadImagePixels(DATASET_TRAIN_PATH +"/Rocket League/RL1Image-00" + j + ".jpg");
+                        if (matchIndexWithEpoch)
+                        {
+                            j = epoch+1;
+                        }
+
+                        double[] inputsRL = LoadImagePixels(DATASET_TRAIN_PATH +"/Rocket League/RL-image-" + j + ".jpg");
                         double[] outputsRL = new double[] { 1, 0, 0 };
 
-                        double[] inputsCS = LoadImagePixels(DATASET_TRAIN_PATH +"/Counter Strike/CS1Image-00" + j + ".jpg");
+                        double[] inputsCS = LoadImagePixels(DATASET_TRAIN_PATH +"/Counter Strike/CS-image-" + j + ".jpg");
                         double[] outputsCS = new double[] { 0, 1, 0 };
 
-                        double[] inputsDS = LoadImagePixels(DATASET_TRAIN_PATH +"/Dark Souls/DSP2Image-00" + j + ".jpg");
+                        double[] inputsDS = LoadImagePixels(DATASET_TRAIN_PATH +"/Dark Souls/DS-image-" + j + ".jpg");
                         double[] outputsDS = new double[] { 0, 0, 1 };
 
                         p.train(inputsRL, outputsRL);
@@ -149,6 +156,7 @@ public class App : MonoBehaviour
                 float trainingDuration = Time.time - startTraining;
                 Debug.Log("Training finished (duration : "+ trainingDuration + "s");
 
+                p.saveToFile("path_to_your_file.dat");
                 predictTestSample();
                 printPythonPlotScript();
             }
@@ -205,7 +213,6 @@ public class App : MonoBehaviour
                 myList.Add(pixel.r);
                 myList.Add(pixel.g);
                 myList.Add(pixel.b);
-
             }
         }
         

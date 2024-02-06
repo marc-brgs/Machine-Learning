@@ -16,3 +16,5 @@ extern "C" MLLIBRARY_API void initializePerceptron(Perceptron* perceptron, int i
 extern "C" MLLIBRARY_API void trainPerceptron(Perceptron* perceptron, const double* input, const double* targetOutput, double learningRate);
 extern "C" MLLIBRARY_API void predictPerceptron(Perceptron* perceptron, const double* input, double* output);
 extern "C" MLLIBRARY_API void evaluatePerceptron(Perceptron* perceptron, double* error);
+extern "C" MLLIBRARY_API void savePerceptronToFile(Perceptron * perceptron, const char* filename);
+extern "C" MLLIBRARY_API void loadPerceptronFromFile(Perceptron * perceptron, const char* filename);

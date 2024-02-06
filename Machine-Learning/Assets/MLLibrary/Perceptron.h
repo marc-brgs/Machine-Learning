@@ -19,6 +19,9 @@ public:
     // Métriques
     void getOutputError(double* error);
 
+    void saveToFile(const std::string& filename);
+    void loadFromFile(const std::string& filename);
+
 private:
     // Tailles des couches
     int inputLayerSize;

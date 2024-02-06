@@ -24,6 +24,12 @@ public class PerceptronWrapper
     [DllImport("MLLibrary")]
     public static extern void evaluatePerceptron(IntPtr perceptron, double[] error);
 
+    [DllImport("MLLibrary")]
+    public static extern void savePerceptronToFile(IntPtr perceptron, string filename);
+
+    [DllImport("MLLibrary")]
+    public static extern void loadPerceptronFromFile(IntPtr perceptron, string filename);
+
     public IntPtr perceptron;
     public double learningRate;
 
@@ -89,6 +95,16 @@ public class PerceptronWrapper
         }
 
         return output;
+    }
+
+    public void saveToFile(string filename)
+    {
+        savePerceptronToFile(perceptron, filename);
+    }
+
+    public void loadFromFile(string filename)
+    {
+        loadPerceptronFromFile(perceptron, filename);
     }
 
     /**

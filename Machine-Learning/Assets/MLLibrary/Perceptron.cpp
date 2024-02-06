@@ -162,6 +162,74 @@ void Perceptron::predict(const double* input, double* output) {
     }
 }
 
+void Perceptron::saveToFile(const std::string& filename) {
+    std::ofstream outFile(filename, std::ios::binary);
+    if (!outFile.is_open()) {
+        throw std::runtime_error("Could not open file for writing: " + filename);
+    }
+
+    // Sérialisation des tailles des couches
+    outFile.write(reinterpret_cast<const char*>(&inputLayerSize), sizeof(inputLayerSize));
+    int hiddenLayersCount = hiddenLayerSizes.size();
+    outFile.write(reinterpret_cast<const char*>(&hiddenLayersCount), sizeof(hiddenLayersCount));
+    for (int size : hiddenLayerSizes) {
+        outFile.write(reinterpret_cast<const char*>(&size), sizeof(size));
+    }
+    outFile.write(reinterpret_cast<const char*>(&outputLayerSize), sizeof(outputLayerSize));
+
+    // Sérialisation des poids et biais
+    for (const auto& layerWeights : weights) {
+        for (const auto& neuronWeights : layerWeights) {
+            for (double weight : neuronWeights) {
+                outFile.write(reinterpret_cast<const char*>(&weight), sizeof(weight));
+            }
+        }
+    }
+    for (const auto& layerBiases : biases) {
+        for (double bias : layerBiases) {
+            outFile.write(reinterpret_cast<const char*>(&bias), sizeof(bias));
+        }
+    }
+
+    outFile.close();
+}
+
+void Perceptron::loadFromFile(const std::string& filename) {
+    std::ifstream inFile(filename, std::ios::binary);
+    if (!inFile.is_open()) {
+        throw std::runtime_error("Could not open file for reading: " + filename);
+    }
+
+    // Désérialisation des tailles des couches
+    inFile.read(reinterpret_cast<char*>(&inputLayerSize), sizeof(inputLayerSize));
+    int hiddenLayersCount;
+    inFile.read(reinterpret_cast<char*>(&hiddenLayersCount), sizeof(hiddenLayersCount));
+    hiddenLayerSizes.resize(hiddenLayersCount);
+    for (int& size : hiddenLayerSizes) {
+        inFile.read(reinterpret_cast<char*>(&size), sizeof(size));
+    }
+    inFile.read(reinterpret_cast<char*>(&outputLayerSize), sizeof(outputLayerSize));
+
+    initializeWeights();
+    initializeBiases();
+
+    // Désérialisation des poids et biais
+    for (auto& layerWeights : weights) {
+        for (auto& neuronWeights : layerWeights) {
+            for (double& weight : neuronWeights) {
+                inFile.read(reinterpret_cast<char*>(&weight), sizeof(weight));
+            }
+        }
+    }
+    for (auto& layerBiases : biases) {
+        for (double& bias : layerBiases) {
+            inFile.read(reinterpret_cast<char*>(&bias), sizeof(bias));
+        }
+    }
+
+    inFile.close();
+}
+
 void Perceptron::getOutputError(double* error) {
     for (size_t i = 0; i < outputLayerSize; i++) {
         error[i] = outputError[i];

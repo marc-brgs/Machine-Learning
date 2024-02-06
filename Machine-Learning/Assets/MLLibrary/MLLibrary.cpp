@@ -34,3 +34,11 @@ void predictPerceptron(Perceptron* perceptron, const double* input, double* outp
 void evaluatePerceptron(Perceptron* perceptron, double* error) {
     perceptron->getOutputError(error);
 }
+
+void savePerceptronToFile(Perceptron* perceptron, const char* filename) {
+    perceptron->saveToFile(filename);
+}
+
+void loadPerceptronFromFile(Perceptron* perceptron, const char* filename) {
+    perceptron->loadFromFile(filename);
+}
