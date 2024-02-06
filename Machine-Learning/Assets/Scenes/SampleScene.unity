@@ -376,7 +376,9 @@ MonoBehaviour:
   epochs: 20
   epochCluster: 1
   printInterval: 1
-  learningRate: 0.2
+  learningRate: 0.1
   inputLayerSize: 3888
   hiddenLayerSizes: 64000000140000000a000000
   outputLayerSize: 3
+  imagesPerGame: 1
+  imageIndexToTest: 0

@@ -1,12 +1,14 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using Unity.PlasticSCM.Editor.WebApi;
 using Unity.VisualScripting;
 using UnityEngine;
 
 public class App : MonoBehaviour
 {
-    PerceptronWrapper p;
+    private PerceptronWrapper p;
     public int epochs = 100000;
     public int epochCluster = 100; // Higher = faster processing but less fps
     public int printInterval = 1000;
@@ -14,17 +16,26 @@ public class App : MonoBehaviour
     public int inputLayerSize = 3888;
     public List<int> hiddenLayerSizes = new List<int> { 100, 20, 10 };
     public int outputLayerSize = 3;
-    public int imagesPerGame = 3;
-    public int imageIndexToTest = 5;
+    public int imagesPerGame = 1;
+    public int imageIndexToTest = 0;
+
+    private const string DATASET_TRAIN_PATH = "./Assets/Dataset/Train";
+    private double[] targetOutputRL = new double[] { 1, 0, 0 };
+    private double[] targetOutputCS = new double[] { 0, 1, 0 };
+    private double[] targetOutputDS = new double[] { 0, 0, 1 };
 
     private bool isTraining = true;
+    private float startTraining;
     private int epoch = 0;
+    private List<List<double>> errorMargins = new List<List<double>>();
 
-    string[] RLImagesPath;
-    string[] CSImagesPath;
-    string[] DSImagesPath;
 
-    float startTraining;
+    private enum Game
+    {
+        RocketLeague,
+        CounterStrike,
+        DarkSouls
+    }
 
     // Start is called before the first frame update
     void Start()
@@ -32,31 +43,66 @@ public class App : MonoBehaviour
         p = new PerceptronWrapper(inputLayerSize, hiddenLayerSizes.ToArray(), outputLayerSize);
         p.learningRate = learningRate;
 
-        //RLImagesPath = ReadFolder("./Assets/Dataset/Train/Rocket League");
-        //CSImagesPath = ReadFolder("./Assets/Dataset/Train/Counter Strike");
-        //DSImagesPath = ReadFolder("./Assets/Dataset/Train/Dark Souls");
-
-        testPredictWithSample();
+        predictTestSample();
         startTraining = Time.time;
+
+        // Init error margins
+        for (int i = 0; i < 3; i++)
+        {
+            errorMargins.Add(new List<double>());
+        }
     }
 
-    public void testPredictWithSample(bool measure=false)
+    public void measureTestSample()
+    {        
+        // to finish (multiple lists)
+        double[] outputRL = p.predict(LoadImagePixels(DATASET_TRAIN_PATH +"/Rocket League/RL1Image-00" + imageIndexToTest + ".jpg"));
+        registerErrorAverage(Game.RocketLeague, outputRL);
+
+        double[] outputCS = p.predict(LoadImagePixels(DATASET_TRAIN_PATH +"/Counter Strike/CS1Image-00" + imageIndexToTest + ".jpg"));
+        registerErrorAverage(Game.CounterStrike, outputCS);
+
+        double[] outputDS = p.predict(LoadImagePixels(DATASET_TRAIN_PATH +"/Dark Souls/DSP2Image-00" + imageIndexToTest + ".jpg"));
+        registerErrorAverage(Game.DarkSouls, outputDS);
+    }
+
+    private void registerErrorAverage(Game game, double[] currentOutput)
     {
-        double[] output = p.predict(PixelLoader(LoadPNG("./Assets/Dataset/Train/Rocket League/RL1Image-00"+ imageIndexToTest +".jpg")));
-
-        if (measure)
+        if(game == Game.RocketLeague)
         {
-            p.getOutputError();
+            errorMargins[0].Add(computeErrorAverage(targetOutputRL, currentOutput));
         }
-        else
+        else if(game == Game.CounterStrike)
         {
-            double[] output2 = p.predict(PixelLoader(LoadPNG("./Assets/Dataset/Train/Counter Strike/CS1Image-00"+ imageIndexToTest + ".jpg")));
-            double[] output3 = p.predict(PixelLoader(LoadPNG("./Assets/Dataset/Train/Dark Souls/DSP2Image-00"+ imageIndexToTest +".jpg")));
-            Debug.Log("Test d'image Rocket League (probabilités) : (RL : " + output[0] + ", CS : " + output[1] + ", DS : " + output[2] + ")");
-            Debug.Log("Test d'image Counter Strike (probabilités) : (RL : " + output2[0] + ", CS : " + output2[1] + ", DS : " + output2[2] + ")");
-            Debug.Log("Test d'image Dark Souls (probabilités) : (RL : " + output3[0] + ", CS : " + output3[1] + ", DS : " + output3[2] + ")");
+            errorMargins[1].Add(computeErrorAverage(targetOutputCS, currentOutput));
         }
+        else if(game == Game.DarkSouls)
+        {
+            errorMargins[2].Add(computeErrorAverage(targetOutputDS, currentOutput));
+        }
+    }
 
+    private double computeErrorAverage(double[] target, double[] current)
+    {
+        double avg = 0;
+        for(int i = 0; i < target.Length; i++)
+        {
+            avg += Math.Abs(target[i] - current[i]);
+        }
+        avg /= target.Length;
+
+        return avg;
+    }
+
+    public void predictTestSample()
+    {
+        double[] outputRL = p.predict(LoadImagePixels(DATASET_TRAIN_PATH + "/Rocket League/RL1Image-00" + imageIndexToTest + ".jpg"));
+        double[] outputCS = p.predict(LoadImagePixels(DATASET_TRAIN_PATH + "/Counter Strike/CS1Image-00" + imageIndexToTest + ".jpg"));
+        double[] outputDS = p.predict(LoadImagePixels(DATASET_TRAIN_PATH + "/Dark Souls/DSP2Image-00" + imageIndexToTest + ".jpg"));
+
+        Debug.Log("Test d'image Rocket League (proba.) : (RL : "+ outputRL[0] +", CS: " + outputRL[1] + ", DS: " + outputRL[2] + ")");
+        Debug.Log("Test d'image Counter Strike (proba.) : (RL : " + outputCS[0] + ", CS: " + outputCS[1] + ", DS: " + outputCS[2] + ")");
+        Debug.Log("Test d'image Dark Souls (proba.) : (RL : " + outputDS[0] + ", CS: " + outputDS[1] + ", DS: " + outputDS[2] + ")");
     }
 
     // Update is called once per frame
@@ -73,19 +119,13 @@ public class App : MonoBehaviour
 
                     for(int j = 0; j < imagesPerGame; j++)
                     {
-                        //Texture2D texRL = LoadPNG(RLImagesPath[i]);
-                        Texture2D texRL = LoadPNG("./Assets/Dataset/Train/Rocket League/RL1Image-00"+ j + ".jpg");
-                        double[] inputsRL = PixelLoader(texRL);
+                        double[] inputsRL = LoadImagePixels(DATASET_TRAIN_PATH +"/Rocket League/RL1Image-00" + j + ".jpg");
                         double[] outputsRL = new double[] { 1, 0, 0 };
 
-                        //Texture2D texCS = LoadPNG(CSImagesPath[i]);
-                        Texture2D texCS = LoadPNG("./Assets/Dataset/Train/Counter Strike/CS1Image-00"+ j +".jpg");
-                        double[] inputsCS = PixelLoader(texCS);
+                        double[] inputsCS = LoadImagePixels(DATASET_TRAIN_PATH +"/Counter Strike/CS1Image-00" + j + ".jpg");
                         double[] outputsCS = new double[] { 0, 1, 0 };
 
-                        //Texture2D texDS = LoadPNG(DSImagesPath[i]);
-                        Texture2D texDS = LoadPNG("./Assets/Dataset/Train/Dark Souls/DSP2Image-00"+ j +".jpg");
-                        double[] inputsDS = PixelLoader(texDS);
+                        double[] inputsDS = LoadImagePixels(DATASET_TRAIN_PATH +"/Dark Souls/DSP2Image-00" + j + ".jpg");
                         double[] outputsDS = new double[] { 0, 0, 1 };
 
                         p.train(inputsRL, outputsRL);
@@ -93,10 +133,10 @@ public class App : MonoBehaviour
                         p.train(inputsDS, outputsDS);
                     }
 
-                    testPredictWithSample(true);
+                    measureTestSample();
                     epoch++;
 
-                    // Current step
+                    // Debug current step
                     if (epoch % printInterval == 0)
                     {
                         Debug.Log(epoch + " / " + epochs);
@@ -109,9 +149,8 @@ public class App : MonoBehaviour
                 float trainingDuration = Time.time - startTraining;
                 Debug.Log("Training finished (duration : "+ trainingDuration + "s");
 
-                testPredictWithSample();
-                p.printErrorOverTime();
-                p.printPythonPlotScript();
+                predictTestSample();
+                printPythonPlotScript();
             }
         }
     }
@@ -125,10 +164,8 @@ public class App : MonoBehaviour
                 isTraining = false;
                 Debug.Log("Training interrupted");
 
-                p.predict(new double[] { 0, 0 }, true);
-                p.predict(new double[] { 0, 1 }, true);
-                p.predict(new double[] { 1, 0 }, true);
-                p.predict(new double[] { 1, 1 }, true);
+                predictTestSample();
+                printPythonPlotScript();
             }
             else
             {
@@ -138,9 +175,8 @@ public class App : MonoBehaviour
         }
     }
 
-    public static Texture2D LoadPNG(string filePath)
+    public static Texture2D LoadTexture(string filePath)
     {
-
         Texture2D tex = null;
         byte[] fileData;
 
@@ -150,10 +186,14 @@ public class App : MonoBehaviour
             tex = new Texture2D(48, 27); // 48x27 pixels (1296 pixels)
             tex.LoadImage(fileData); //..this will auto-resize the texture dimensions
         }
+        else
+        {
+            Debug.Log("Path \""+ filePath +"\" does not exists!");
+        }
         return tex;
     }
 
-    public double[] PixelLoader(Texture2D tex)
+    public double[] LoadFlatPixels(Texture2D tex)
     {
         List<double> myList = new List<double>();
         for (int i = 0; i < tex.width; i++)
@@ -168,10 +208,63 @@ public class App : MonoBehaviour
 
             }
         }
-        //Debug.Log(myList.Count);
+        
         return myList.ToArray();
     }
-    
+
+    public double[] LoadImagePixels(string filePath)
+    {
+        Texture2D tex = LoadTexture(filePath);
+        return LoadFlatPixels(tex);
+    }
+
+    public void printPythonPlotScript()
+    {
+        string index = string.Empty;
+        string valueRL = string.Empty;
+        string valueCS = string.Empty;
+        string valueDS = string.Empty;
+        for (int i = 0; i < this.errorMargins[0].Count; i++)
+        {
+            index += i;
+            valueRL += this.errorMargins[0][i].ToString("F5").Replace(",", ".");
+            valueCS += this.errorMargins[1][i].ToString("F5").Replace(",", ".");
+            valueDS += this.errorMargins[2][i].ToString("F5").Replace(",", ".");
+
+            // Separate values
+            if (i != this.errorMargins[0].Count - 1)
+            {
+                index += ",";
+                valueRL += ",";
+                valueCS += ",";
+                valueDS += ",";
+            }
+        }
+
+        string script =
+            "import matplotlib.pyplot as plt\n" +
+            "import numpy as np\n" +
+            "index = [" + index + "]\n" +
+            "valueRL = [" + valueRL + "]\n" +
+            "valueCS = [" + valueCS + "]\n" +
+            "valueDS = [" + valueDS + "]\n" +
+            "plt.plot(index, valueRL, label=\"Rocket League\")\n" +
+            "plt.plot(index, valueCS, label=\"Counter Strike\")\n" +
+            "plt.plot(index, valueDS, label=\"Dark Souls\")\n" +
+            "plt.title(\"Image prediction (x1)\")\n" +
+            "plt.xlabel(\"Epoch\")\n" +
+            "plt.ylabel(\"Outputs error margin (average)\")\n" +
+            "plt.legend(loc=\"upper right\")\n" +
+            "plt.grid()\n" +
+            "plt.show()\n";
+
+        Debug.Log(script);
+    }
+
+    /**
+     * Deprecated
+     * List images path inside given directory
+     */
     public string[] ReadFolder(string dir)
     {
         if (Directory.Exists(dir))

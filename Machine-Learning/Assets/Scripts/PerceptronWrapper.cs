@@ -135,6 +135,9 @@ public class PerceptronWrapper
         Debug.Log(str);
     }
 
+    /**
+     * Deprecated (use error of latest training)
+     */
     public void printPythonPlotScript()
     {
         string index = string.Empty;
