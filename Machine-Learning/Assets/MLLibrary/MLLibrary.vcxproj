@@ -155,6 +155,7 @@
     <ClInclude Include="Perceptron.h" />
     <ClInclude Include="MLLibrary.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="RBFNetwork.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp" />
@@ -166,6 +167,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="Perceptron.cpp" />
+    <ClCompile Include="RBFNetwork.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

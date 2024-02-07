@@ -373,19 +373,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 246ca4d0bfe193a4290019ab87c6fbbc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  epochs: 1000
-  epochCluster: 10
-  printInterval: 10
-  learningRate: 0.02
+  epochs: 26000
+  epochCluster: 1
+  printInterval: 20
+  learningRate: 0.004
   inputLayerSize: 3888
   hiddenLayerSizes: 64000000140000000a000000
   outputLayerSize: 3
-  imagesCountPerGame: 1
-  matchImagesCountPerGameWithEpoch: 0
-  matchImagesIndexAsRandom: 1
-  imageIndexToTest: 10000
-  measureSample: 0
-  perceptronFilePath: ./Assets/Serialized Perceptrons/3000_images_rand_unkown_100_20_10_lr_02.dat
-  loadPerceptron: 1
+  matchImagesCountPerGameWithEpoch: 1
+  matchImagesIndexAsRandom: 0
+  maxImageIndexOfTrainingData: 13000
+  imageIndexToTest: 13001
+  imagesCountToTest: 10
+  measureSample: 1
+  measureEpochInterval: 520
+  perceptronFilePath: ./Assets/Serialized Perceptrons/78000_images_unkown_100_20_10_lr_004.dat
+  loadPerceptron: 0
   savePerceptron: 1
   savePerceptronOnInterrupt: 1
