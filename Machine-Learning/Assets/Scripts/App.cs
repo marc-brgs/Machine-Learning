@@ -36,7 +36,7 @@ public class App : MonoBehaviour
     private double[] targetOutputCS = new double[] { 0, 1, 0 };
     private double[] targetOutputDS = new double[] { 0, 0, 1 };
 
-    private bool isTraining = true;
+    private bool isTraining = false;
     private DateTime startTime;
     private int epoch = 0;
     private List<List<double>> errorMargins = new List<List<double>>();
@@ -47,26 +47,6 @@ public class App : MonoBehaviour
         RocketLeague,
         CounterStrike,
         DarkSouls
-    }
-
-    // Start is called before the first frame update
-    void Start()
-    {
-        p = new PerceptronWrapper(inputLayerSize, hiddenLayerSizes.ToArray(), outputLayerSize);
-        p.learningRate = learningRate;
-        if(loadPerceptron)
-        {
-            p.loadFromFile(perceptronFilePath);
-        }
-
-        predictTestSample();
-        startTime = DateTime.UtcNow;
-
-        // Init error margins
-        for (int i = 0; i < 3; i++)
-        {
-            errorMargins.Add(new List<double>());
-        }
     }
 
     // Update is called once per frame
@@ -125,6 +105,27 @@ public class App : MonoBehaviour
                 printPythonPlotScript();
             }
         }
+    }
+
+    public void StartTraining()
+    {
+        p = new PerceptronWrapper(inputLayerSize, hiddenLayerSizes.ToArray(), outputLayerSize);
+        p.learningRate = learningRate;
+        if (loadPerceptron)
+        {
+            p.loadFromFile(perceptronFilePath);
+        }
+
+        predictTestSample();
+        startTime = DateTime.UtcNow;
+
+        // Init error margins
+        for (int i = 0; i < 3; i++)
+        {
+            errorMargins.Add(new List<double>());
+        }
+
+        isTraining = true;
     }
 
     private void InterruptTraining()
