@@ -811,7 +811,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dde96cfd71f48f24f959b40d89729aab, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  modelPath: ./Assets/Serialized Perceptrons/39000_images_unkown_100_20_10_lr_004.dat
+  modelPath: ./Assets/Serialized Perceptrons/156000_images_unkown_100_20_10_lr_004.dat
   minRandomImageIndex: 13001
   maxRandomImageIndex: 13400
   defaultResultColor: {r: 0.95, g: 0.95, b: 0.95, a: 1}
@@ -3368,7 +3368,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 246ca4d0bfe193a4290019ab87c6fbbc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  epochs: 26000
+  epochs: 52000
   epochCluster: 1
   printInterval: 20
   learningRate: 0.004
@@ -3381,8 +3381,8 @@ MonoBehaviour:
   imageIndexToTest: 13001
   imagesCountToTest: 10
   measureSample: 1
-  measureEpochInterval: 520
-  perceptronFilePath: ./Assets/Serialized Perceptrons/78000_images_unkown_100_20_10_lr_004.dat
+  measureEpochInterval: 1040
+  perceptronFilePath: ./Assets/Serialized Perceptrons/156000_images_unkown_100_20_10_lr_004.dat
   loadPerceptron: 0
   savePerceptron: 1
   savePerceptronOnInterrupt: 1
