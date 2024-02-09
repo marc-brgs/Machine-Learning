@@ -60,6 +60,12 @@ public class UseApp : MonoBehaviour
         }
     }
 
+    public void ExitUseApp()
+    {
+        mainMenu.SetActive(true);
+        useMenu.SetActive(false);
+    }
+
     public void RandomPredictRL()
     {
         RandomPredict(Game.RocketLeague);

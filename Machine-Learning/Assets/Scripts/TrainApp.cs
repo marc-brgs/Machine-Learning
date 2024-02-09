@@ -6,7 +6,7 @@ using Unity.PlasticSCM.Editor.WebApi;
 using Unity.VisualScripting;
 using UnityEngine;
 
-public class App : MonoBehaviour
+public class TrainApp : MonoBehaviour
 {
     private PerceptronWrapper p;
     public int epochs = 100000;
@@ -93,7 +93,7 @@ public class App : MonoBehaviour
                 
                 isTraining = false;
                 TimeSpan trainingDuration = DateTime.UtcNow - startTime;
-                Debug.Log("Training finished (duration : "+ trainingDuration + "s");
+                Debug.Log("Training finished (duration : "+ trainingDuration + ")");
 
                 if(savePerceptron)
                 {
