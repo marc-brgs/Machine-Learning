@@ -8,7 +8,7 @@ public:
     ~Perceptron();
 
     // Init (input, [hidden], output)
-    void initialize(int inputSize, const std::vector<int>& hiddenLayerSizes, int outputSize);
+    void initialize(int inputSize, const std::vector<int>& hiddenLayerSizes, int outputSize, bool isLinearModel);
 
     // Back propagation
     void train(const double* input, const double* targetOutput, double learningRate);
@@ -19,10 +19,14 @@ public:
     // Métriques
     void getOutputError(double* error);
 
+    // Serialisation
     void saveToFile(const std::string& filename);
     void loadFromFile(const std::string& filename);
 
 private:
+    // Linéarité
+    bool isLinearModel;
+
     // Tailles des couches
     int inputLayerSize;
     std::vector<int> hiddenLayerSizes;

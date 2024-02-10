@@ -13,7 +13,7 @@ public class PerceptronWrapper
     public static extern void destroyPerceptron(IntPtr perceptron);
 
     [DllImport("MLLibrary")]
-    public static extern void initializePerceptron(IntPtr perceptron, int inputSize, int[] hiddenLayerSize, int hiddenLayerCount, int outputSize);
+    public static extern void initializePerceptron(IntPtr perceptron, int inputSize, int[] hiddenLayerSize, int hiddenLayerCount, int outputSize, bool isLinearModel);
     
     [DllImport("MLLibrary")]
     public static extern void trainPerceptron(IntPtr perceptron, double[] input, double[] targetOutput, double learningRate);
@@ -32,23 +32,23 @@ public class PerceptronWrapper
 
     public IntPtr perceptron;
     public double learningRate;
+    public bool isLinearModel;
 
     private int outputSize;
-    private List<double> errorOverTime;
 
-    public PerceptronWrapper(int inputSize, int[] hiddenLayerSize, int outputSize)
+    public PerceptronWrapper(int inputSize, int[] hiddenLayerSize, int outputSize, bool isLinearModel=false)
     {
         IntPtr perceptronPtr;
         createPerceptron(out perceptronPtr);
         Debug.Log("Perceptron created");
 
         this.outputSize = outputSize;
-        initializePerceptron(perceptronPtr, inputSize, hiddenLayerSize, hiddenLayerSize.Length, outputSize); // par référence?
-        Debug.Log("Perceptron initialized");
+        initializePerceptron(perceptronPtr, inputSize, hiddenLayerSize, hiddenLayerSize.Length, outputSize, isLinearModel); // par référence?
+        Debug.Log("Perceptron initialized (linear : " + isLinearModel + ")");
 
         this.perceptron = perceptronPtr;
-        this.learningRate = 0.02;
-        this.errorOverTime = new List<double>();
+        this.isLinearModel = isLinearModel;
+        this.learningRate = 0.02; // Default value
     }
 
     ~PerceptronWrapper()
@@ -97,12 +97,18 @@ public class PerceptronWrapper
         return output;
     }
 
+    /**
+     * Serialize perceptron to file
+     */
     public void saveToFile(string filename)
     {
         savePerceptronToFile(perceptron, filename);
         Debug.Log("Perceptron saved to \"" + filename + "\"");
     }
 
+    /**
+     * Unserialize perceptron from file
+     */
     public void loadFromFile(string filename)
     {
         if(System.IO.File.Exists(filename))
@@ -115,86 +121,5 @@ public class PerceptronWrapper
             Debug.Log("Failed to load perceptron from \"" + filename + "\"");
         }
         
-    }
-
-    /**
-     * Measure error of the latest training (must have been trained at least once before)
-     * Should be called after train method
-     */
-    public void getOutputError(bool print=false)
-    {
-        double[] error = new double[this.outputSize];
-
-        evaluatePerceptron(this.perceptron, error);
-
-        double avgError = 0;
-        string str = "";
-        for (int i = 0; i < error.Length; i++)
-        {
-            if (print)
-            {
-                str += "ERROR[" + i + "] : " + error[i] + "\n";
-            }
-
-            avgError += Math.Abs(error[i]);
-        }
-        avgError /= error.Length;
-
-        if (print)
-        {
-            Debug.Log(str);
-        }
-        errorOverTime.Add(avgError);
-    }
-
-    /**
-     * Print each measured error (by getOutputError) in Unity console
-     */
-    public void printErrorOverTime()
-    {
-        string str = string.Empty;
-        for(int i = 0; i < this.errorOverTime.Count; i++)
-        {
-            str += i + ", " + this.errorOverTime[i].ToString("F5").Replace(",", ".") + "\n";
-        }
-
-        Debug.Log(str);
-    }
-
-    /**
-     * Deprecated (use error of latest training)
-     */
-    public void printPythonPlotScript()
-    {
-        string index = string.Empty;
-        string value = string.Empty;
-        for (int i = 0; i < this.errorOverTime.Count; i++)
-        {
-            index += i;
-            value += this.errorOverTime[i].ToString("F5").Replace(",", ".");
-
-            if(i != this.errorOverTime.Count - 1)
-            {
-                index += ",";
-                value += ",";
-            }
-        }
-        // Remove last char (",")
-        //index.Remove(index.Length - 1);
-        //value.Remove(value.Length - 1);
-
-        string script =
-            "import matplotlib.pyplot as plt\n" +
-            "import numpy as np\n" +
-            "index = [" + index + "]\n" +
-            "value = [" + value + "]\n" +
-            "plt.plot(index, value)\n" +
-            "plt.title(\"x1 Image prediction\")\n" +
-            "plt.xlabel(\"Epoch\")\n" +
-            "plt.ylabel(\"Outputs error margin (average)\")\n" +
-            "plt.grid()\n" +
-            "plt.show()\n";
-
-        Debug.Log(script);
     }
 }
