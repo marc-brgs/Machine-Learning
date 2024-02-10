@@ -4704,8 +4704,8 @@ MonoBehaviour:
   measureEpochInterval: 1040
   perceptronFilePath: ./Assets/Serialized Perceptrons/156000_images_unkown_100_20_10_lr_004.dat
   loadPerceptron: 0
-  savePerceptron: 1
-  savePerceptronOnInterrupt: 1
+  savePerceptron: 0
+  savePerceptronOnInterrupt: 0
 --- !u!4 &1591554120
 Transform:
   m_ObjectHideFlags: 0

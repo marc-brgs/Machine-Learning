@@ -10,7 +10,7 @@ public class TrainApp : MonoBehaviour
 {
     private PerceptronWrapper p;
     public int epochs = 100000;
-    public int epochCluster = 100; // Higher = faster processing but less fps
+    public int epochCluster = 10; // Higher = faster processing but less fps
     public int printInterval = 1000;
     public double learningRate = 0.05f;
     public int inputLayerSize = 3888;
@@ -29,7 +29,7 @@ public class TrainApp : MonoBehaviour
     public bool loadPerceptron = false;
     public bool savePerceptron = true;
     public bool savePerceptronOnInterrupt = false;
-    
+
 
     private const string DATASET_TRAIN_PATH = "./Assets/Dataset/Train";
     private double[] targetOutputRL = new double[] { 1, 0, 0 };
@@ -161,9 +161,9 @@ public class TrainApp : MonoBehaviour
 
         for (int i = imageIndexToTest; i < imageIndexToTest + imagesCountToTest; i++)
         {
-            double[] outputRL = p.predict(LoadImagePixels(DATASET_TRAIN_PATH + "/Rocket League/RL-image-" + i + ".jpg"));
-            double[] outputCS = p.predict(LoadImagePixels(DATASET_TRAIN_PATH + "/Counter Strike/CS-image-" + i + ".jpg"));
-            double[] outputDS = p.predict(LoadImagePixels(DATASET_TRAIN_PATH + "/Dark Souls/DS-image-" + i + ".jpg"));
+            double[] outputRL = p.predict(ImageLoader.LoadImagePixels(DATASET_TRAIN_PATH + "/Rocket League/RL-image-" + i + ".jpg"));
+            double[] outputCS = p.predict(ImageLoader.LoadImagePixels(DATASET_TRAIN_PATH + "/Counter Strike/CS-image-" + i + ".jpg"));
+            double[] outputDS = p.predict(ImageLoader.LoadImagePixels(DATASET_TRAIN_PATH + "/Dark Souls/DS-image-" + i + ".jpg"));
 
             for(int j = 0; j < 3; j++)
             {
@@ -189,9 +189,9 @@ public class TrainApp : MonoBehaviour
 
     private void trainTestSample(int index)
     {
-        double[] inputsRL = LoadImagePixels(DATASET_TRAIN_PATH + "/Rocket League/RL-image-" + index + ".jpg");
-        double[] inputsCS = LoadImagePixels(DATASET_TRAIN_PATH + "/Counter Strike/CS-image-" + index + ".jpg");
-        double[] inputsDS = LoadImagePixels(DATASET_TRAIN_PATH + "/Dark Souls/DS-image-" + index + ".jpg");
+        double[] inputsRL = ImageLoader.LoadImagePixels(DATASET_TRAIN_PATH + "/Rocket League/RL-image-" + index + ".jpg");
+        double[] inputsCS = ImageLoader.LoadImagePixels(DATASET_TRAIN_PATH + "/Counter Strike/CS-image-" + index + ".jpg");
+        double[] inputsDS = ImageLoader.LoadImagePixels(DATASET_TRAIN_PATH + "/Dark Souls/DS-image-" + index + ".jpg");
 
         p.train(inputsRL, targetOutputRL);
         p.train(inputsCS, targetOutputCS);
@@ -206,9 +206,9 @@ public class TrainApp : MonoBehaviour
 
         for (int i = imageIndexToTest; i < imageIndexToTest + imagesCountToTest; i++)
         {
-            double[] outputRL = p.predict(LoadImagePixels(DATASET_TRAIN_PATH + "/Rocket League/RL-image-" + i + ".jpg"));
-            double[] outputCS = p.predict(LoadImagePixels(DATASET_TRAIN_PATH + "/Counter Strike/CS-image-" + i + ".jpg"));
-            double[] outputDS = p.predict(LoadImagePixels(DATASET_TRAIN_PATH + "/Dark Souls/DS-image-" + i + ".jpg"));
+            double[] outputRL = p.predict(ImageLoader.LoadImagePixels(DATASET_TRAIN_PATH + "/Rocket League/RL-image-" + i + ".jpg"));
+            double[] outputCS = p.predict(ImageLoader.LoadImagePixels(DATASET_TRAIN_PATH + "/Counter Strike/CS-image-" + i + ".jpg"));
+            double[] outputDS = p.predict(ImageLoader.LoadImagePixels(DATASET_TRAIN_PATH + "/Dark Souls/DS-image-" + i + ".jpg"));
 
             
             for(int j = 0; j < 3; j++)
@@ -261,48 +261,6 @@ public class TrainApp : MonoBehaviour
         return avg;
     }
 
-    public static Texture2D LoadTexture(string filePath)
-    {
-        Texture2D tex = null;
-        byte[] fileData;
-
-        if (File.Exists(filePath))
-        {
-            fileData = File.ReadAllBytes(filePath);
-            tex = new Texture2D(48, 27); // 48x27 pixels (1296 pixels)
-            tex.LoadImage(fileData); //..this will auto-resize the texture dimensions
-        }
-        else
-        {
-            Debug.Log("Path \""+ filePath +"\" does not exists!");
-        }
-        return tex;
-    }
-
-    public double[] LoadFlatPixels(Texture2D tex)
-    {
-        List<double> myList = new List<double>();
-        for (int i = 0; i < tex.width; i++)
-        {
-            for (int j = 0; j < tex.height; j++)
-            {
-                Color pixel = tex.GetPixel(i, j);
-
-                myList.Add(pixel.r);
-                myList.Add(pixel.g);
-                myList.Add(pixel.b);
-            }
-        }
-        
-        return myList.ToArray();
-    }
-
-    public double[] LoadImagePixels(string filePath)
-    {
-        Texture2D tex = LoadTexture(filePath);
-        return LoadFlatPixels(tex);
-    }
-
     public void printPythonPlotScript()
     {
         string index = string.Empty;
@@ -344,24 +302,5 @@ public class TrainApp : MonoBehaviour
             "plt.show()\n";
 
         Debug.Log(script);
-    }
-
-    /**
-     * Deprecated
-     * List images path inside given directory
-     */
-    public string[] ReadFolder(string dir)
-    {
-        if (Directory.Exists(dir))
-        {
-            string[] files = Directory.GetFiles(dir, "*.jpg", SearchOption.AllDirectories);
-            Debug.Log(dir + " : " + files.Length + " images");
-            return files;
-        }
-        else
-        {
-            Debug.Log("Dossier non trouvé : " + dir);
-            return new string[] { };
-        }
     }
 }

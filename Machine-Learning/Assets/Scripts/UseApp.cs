@@ -19,8 +19,7 @@ public class UseApp : MonoBehaviour
     public int inputLayerSize = 3888;
     public List<int> hiddenLayerSizes = new List<int> { 100, 20, 10 };
     public int outputLayerSize = 3;
-
-    private ImageLoader imageLoader;
+    
     private const string DATASET_PATH = "./Assets/Dataset/Train";
     private bool modelLoaded = false;
 
@@ -36,11 +35,6 @@ public class UseApp : MonoBehaviour
         RocketLeague,
         CounterStrike,
         DarkSouls
-    }
-
-    void Start()
-    {
-        imageLoader = new ImageLoader();
     }
 
     public void StartUseApp()
@@ -101,11 +95,11 @@ public class UseApp : MonoBehaviour
             imagePath = DATASET_PATH + "/Dark Souls/DS-image-" + randomIndex + ".jpg";
         }
 
-        Texture2D tex = imageLoader.LoadTexture(imagePath);
+        Texture2D tex = ImageLoader.LoadTexture(imagePath);
         rawImage.texture = tex;
 
         // Predict
-        double[] outputs = p.predict(imageLoader.LoadImagePixels(imagePath));
+        double[] outputs = p.predict(ImageLoader.LoadImagePixels(imagePath));
         List<double> outputsList = outputs.ToList();
         int bestIndex = outputsList.IndexOf(outputsList.Max());
 

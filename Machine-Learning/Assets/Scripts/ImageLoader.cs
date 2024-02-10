@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class ImageLoader
 {
-    public Texture2D LoadTexture(string filePath)
+    public static Texture2D LoadTexture(string filePath)
     {
         Texture2D tex = null;
         byte[] fileData;
@@ -23,7 +23,7 @@ public class ImageLoader
         return tex;
     }
 
-    public double[] LoadFlatPixels(Texture2D tex)
+    public static double[] LoadFlatPixels(Texture2D tex)
     {
         List<double> myList = new List<double>();
         for (int i = 0; i < tex.width; i++)
@@ -41,7 +41,7 @@ public class ImageLoader
         return myList.ToArray();
     }
 
-    public double[] LoadImagePixels(string filePath)
+    public static double[] LoadImagePixels(string filePath)
     {
         Texture2D tex = LoadTexture(filePath);
         return LoadFlatPixels(tex);
